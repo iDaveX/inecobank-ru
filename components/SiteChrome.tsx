@@ -9,7 +9,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   if (pathname === "/pitch") {
-    return <>{children}</>;
+    return <main>{children}</main>;
   }
 
   return (

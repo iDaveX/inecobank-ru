@@ -300,17 +300,19 @@ export function MortgagePage() {
 
       <motion.section
         id="products"
-        className="bg-[#F5F5F5] py-16"
+        className="bg-surface py-16"
         {...sectionMotion}
       >
         <Container>
           <h2 className="text-center text-3xl font-bold text-gray-950">
             Ипотечные программы
           </h2>
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="mt-10 overflow-x-auto pb-2 sm:overflow-visible">
+            <div className="grid auto-cols-[min(280px,calc(100vw-3rem))] grid-flow-col gap-6 sm:auto-cols-auto sm:grid-cols-2 sm:grid-flow-row md:grid-cols-3">
             {MORTGAGE_PRODUCTS.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+            </div>
           </div>
         </Container>
       </motion.section>
@@ -373,8 +375,9 @@ export function MortgagePage() {
                   max={200_000_000}
                   step={1_000_000}
                   value={propertyValue}
+                  aria-valuetext={formatAmd(propertyValue)}
                   onChange={(event) => setPropertyValue(Number(event.target.value))}
-                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-[#0A7C3E]"
+                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-brand-green"
                 />
                 <div className="mt-2 flex justify-between text-xs text-gray-500">
                   <span>5 000 000 AMD</span>
@@ -402,8 +405,9 @@ export function MortgagePage() {
                     max={80}
                     step={5}
                     value={downPercent}
+                    aria-valuetext={`${downPercent}% (${formatAmd(result.downAmount)})`}
                     onChange={(event) => setDownPercent(Number(event.target.value))}
-                    className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-[#0A7C3E]"
+                    className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-brand-green"
                   />
                   <div className="mt-2 flex justify-between text-xs text-gray-500">
                     <span>{Math.round(config.minDown * 100)}%</span>
@@ -431,8 +435,9 @@ export function MortgagePage() {
                   max={30}
                   step={1}
                   value={termYears}
+                  aria-valuetext={`${termYears} лет`}
                   onChange={(event) => setTermYears(Number(event.target.value))}
-                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-[#0A7C3E]"
+                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-brand-green"
                 />
                 <div className="mt-2 flex justify-between text-xs text-gray-500">
                   <span>1 год</span>
@@ -441,7 +446,7 @@ export function MortgagePage() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-[#F5F5F5] p-8">
+            <div className="rounded-2xl bg-surface p-8">
               <p className="text-sm font-semibold text-gray-500">
                 Ежемесячный платёж
               </p>
@@ -485,7 +490,7 @@ export function MortgagePage() {
         </Container>
       </motion.section>
 
-      <motion.section className="bg-[#F5F5F5] py-16" {...sectionMotion}>
+      <motion.section className="bg-surface py-16" {...sectionMotion}>
         <Container>
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-950">Что потребуется</h2>
@@ -505,11 +510,11 @@ export function MortgagePage() {
           <h2 className="text-center text-3xl font-bold text-gray-950">
             Как получить ипотеку
           </h2>
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-5">
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {steps.map((step, index) => (
               <div key={step.number} className="relative">
                 {index < steps.length - 1 ? (
-                  <div className="absolute right-0 top-8 hidden translate-x-1/2 text-2xl text-gray-300 sm:block">
+                  <div className="absolute right-0 top-8 hidden translate-x-1/2 text-2xl text-gray-300 lg:block">
                     →
                   </div>
                 ) : null}
@@ -525,12 +530,12 @@ export function MortgagePage() {
       </motion.section>
 
       <motion.section
-        className="bg-[#0A7C3E] py-12 text-center text-white"
+        className="bg-brand-green py-12 text-center text-white"
         {...sectionMotion}
       >
         <Container>
           <h2 className="text-3xl font-bold">Остались вопросы по ипотеке?</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-white/80">
+          <p className="mx-auto mt-4 max-w-2xl text-white/90">
             Ипотечный специалист объяснит условия и поможет с документами
           </p>
           <a

@@ -311,17 +311,19 @@ export function DepositsPage() {
 
       <motion.section
         id="products"
-        className="bg-[#F5F5F5] py-16"
+        className="bg-surface py-16"
         {...sectionMotion}
       >
         <Container>
           <h2 className="text-center text-3xl font-bold text-gray-950">
             Выберите вклад
           </h2>
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 overflow-x-auto pb-2 sm:overflow-visible">
+            <div className="grid auto-cols-[min(280px,calc(100vw-3rem))] grid-flow-col gap-6 sm:auto-cols-auto sm:grid-cols-2 sm:grid-flow-row lg:grid-cols-4">
             {DEPOSIT_PRODUCTS.map((product) => (
               <DepositCard key={product.id} product={product} />
             ))}
+            </div>
           </div>
         </Container>
       </motion.section>
@@ -406,8 +408,9 @@ export function DepositsPage() {
                   max={amountConfig.max}
                   step={amountConfig.step}
                   value={amount}
+                  aria-valuetext={formatMoney(amount, currency)}
                   onChange={(event) => setAmount(Number(event.target.value))}
-                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-[#0A7C3E]"
+                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-brand-green"
                 />
                 <div className="mt-2 flex justify-between text-xs text-gray-500">
                   <span>{formatMoney(amountConfig.min, currency)}</span>
@@ -432,8 +435,9 @@ export function DepositsPage() {
                   max={36}
                   step={3}
                   value={term}
+                  aria-valuetext={`${term} месяцев`}
                   onChange={(event) => setTerm(Number(event.target.value))}
-                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-[#0A7C3E]"
+                  className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-brand-green"
                 />
                 <div className="mt-2 flex justify-between text-xs text-gray-500">
                   <span>3 мес.</span>
@@ -442,7 +446,7 @@ export function DepositsPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-[#F5F5F5] p-8">
+            <div className="rounded-2xl bg-surface p-8">
               <p className="text-sm font-semibold text-gray-500">Доход за срок</p>
               <div className="mt-3 text-4xl font-extrabold text-brand-green">
                 {formatMoney(result.interest, currency)}
@@ -474,12 +478,12 @@ export function DepositsPage() {
         </Container>
       </motion.section>
 
-      <motion.section className="bg-[#F5F5F5] py-16" {...sectionMotion}>
+      <motion.section className="bg-surface py-16" {...sectionMotion}>
         <Container>
           <h2 className="text-center text-3xl font-bold text-gray-950">
             Как открыть вклад
           </h2>
-          <div className="mt-10 grid grid-cols-2 gap-6 lg:grid-cols-4">
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step, index) => (
               <div key={step.number} className="relative">
                 {index < steps.length - 1 ? (
@@ -499,14 +503,14 @@ export function DepositsPage() {
       </motion.section>
 
       <motion.section
-        className="bg-[#0A7C3E] py-12 text-center text-white"
+        className="bg-brand-green py-12 text-center text-white"
         {...sectionMotion}
       >
         <Container>
           <h2 className="text-3xl font-bold">
             Не знаете, какой вклад выбрать?
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-white/80">
+          <p className="mx-auto mt-4 max-w-2xl text-white/90">
             Позвоните — расскажем про ставки и условия за 5 минут
           </p>
           <a

@@ -6,7 +6,7 @@ export function Logo({ inverse = false }: LogoProps) {
   const textColor = inverse ? "text-white" : "text-brand-green";
 
   return (
-    <div className="flex items-center gap-2" aria-label="INECOBANK">
+    <div className="flex items-center gap-2" role="img" aria-label="INECOBANK">
       {/* InecoBank mark: green square with white "i" */}
       <svg
         width="32"

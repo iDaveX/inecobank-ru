@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 
 const navigation = [
@@ -82,22 +82,80 @@ export function Header() {
     null,
   );
 
+  // Refs for focus management
+  const hamburgerButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const hasOpenedRef = useRef(false);
+
   useEffect(() => {
     const updateShadow = () => setHasShadow(window.scrollY > 10);
-
     updateShadow();
-    window.addEventListener("scroll", updateShadow);
-
+    window.addEventListener("scroll", updateShadow, { passive: true });
     return () => window.removeEventListener("scroll", updateShadow);
   }, []);
 
   useEffect(() => {
     document.body.style.overflow = isDrawerOpen ? "hidden" : "";
-
     return () => {
       document.body.style.overflow = "";
     };
   }, [isDrawerOpen]);
+
+  // Focus management: move focus into drawer on open, return to trigger on close
+  useEffect(() => {
+    if (isDrawerOpen) {
+      hasOpenedRef.current = true;
+      const timer = setTimeout(() => {
+        drawerCloseButtonRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    } else if (hasOpenedRef.current) {
+      hamburgerButtonRef.current?.focus();
+    }
+  }, [isDrawerOpen]);
+
+  // Focus trap: cycle Tab within the drawer, Escape closes it
+  function handleDrawerKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") {
+      setIsDrawerOpen(false);
+      return;
+    }
+    if (event.key !== "Tab" || !drawerRef.current) return;
+
+    const focusable = Array.from(
+      drawerRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey) {
+      if (document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  // Escape closes the active desktop dropdown
+  function handleNavKeyDown(
+    event: React.KeyboardEvent,
+    sectionLabel: string,
+  ) {
+    if (event.key === "Escape" && activeDesktopMenu === sectionLabel) {
+      event.stopPropagation();
+      setActiveDesktopMenu(null);
+    }
+  }
 
   return (
     <header
@@ -110,15 +168,29 @@ export function Header() {
           <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav
+          className="hidden items-center gap-1 lg:flex"
+          aria-label="Основная навигация"
+        >
           {navigation.map((section) => (
             <div
               key={section.label}
               className="group relative"
               onMouseEnter={() => setActiveDesktopMenu(section.label)}
               onMouseLeave={() => setActiveDesktopMenu(null)}
+              onKeyDown={(e) => handleNavKeyDown(e, section.label)}
             >
-              <button className="flex h-11 items-center gap-1 rounded-md px-3 text-sm font-medium text-gray-700 transition-colors hover:text-brand-green">
+              <button
+                type="button"
+                className="flex h-11 items-center gap-1 rounded-md px-3 text-sm font-medium text-gray-700 transition-colors hover:text-brand-green"
+                aria-expanded={activeDesktopMenu === section.label}
+                aria-haspopup="true"
+                onClick={() =>
+                  setActiveDesktopMenu(
+                    activeDesktopMenu === section.label ? null : section.label,
+                  )
+                }
+              >
                 {section.label}
                 <ChevronDown
                   className="h-4 w-4 transition-transform group-hover:rotate-180"
@@ -132,6 +204,8 @@ export function Header() {
                 }
                 variants={menuVariants}
                 className="absolute left-0 top-full min-w-56 pt-2"
+                role="menu"
+                aria-label={section.label}
               >
                 <div className="rounded-lg bg-white p-2 shadow-xl ring-1 ring-black/5">
                   {section.items.map((item) => (
@@ -139,6 +213,7 @@ export function Header() {
                       key={item.label}
                       href={item.href}
                       className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
+                      role="menuitem"
                     >
                       {item.label}
                     </a>
@@ -168,14 +243,22 @@ export function Header() {
           >
             Открыть счёт
           </a>
-          <span className="text-sm font-medium text-gray-500">RU</span>
+          <span
+            className="text-sm font-medium text-gray-500"
+            aria-label="Язык: русский"
+          >
+            RU
+          </span>
         </div>
 
         <button
+          ref={hamburgerButtonRef}
           type="button"
           className="inline-flex h-11 w-11 items-center justify-center rounded-md text-brand-green transition-colors hover:bg-brand-green/10 lg:hidden"
           onClick={() => setIsDrawerOpen(true)}
           aria-label="Открыть меню"
+          aria-expanded={isDrawerOpen}
+          aria-controls="mobile-drawer"
         >
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
@@ -184,27 +267,34 @@ export function Header() {
       <AnimatePresence>
         {isDrawerOpen ? (
           <>
-            <motion.button
-              type="button"
+            {/* Backdrop: aria-hidden so screen readers don't announce it */}
+            <motion.div
+              aria-hidden="true"
               className="fixed inset-0 z-50 bg-black/40"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsDrawerOpen(false)}
-              aria-label="Закрыть меню"
             />
             <motion.aside
+              ref={drawerRef}
+              id="mobile-drawer"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Навигация"
               className="fixed inset-y-0 left-0 z-50 flex w-[min(22rem,88vw)] flex-col bg-white shadow-2xl"
               variants={drawerVariants}
               initial="hidden"
               animate="visible"
               exit="hidden"
+              onKeyDown={handleDrawerKeyDown}
             >
               <div className="flex h-20 items-center justify-between border-b border-gray-100 px-4">
-                <Link href="/">
+                <Link href="/" onClick={() => setIsDrawerOpen(false)}>
                   <Logo />
                 </Link>
                 <button
+                  ref={drawerCloseButtonRef}
                   type="button"
                   className="inline-flex h-10 w-10 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-brand-green"
                   onClick={() => setIsDrawerOpen(false)}
@@ -229,6 +319,7 @@ export function Header() {
                         onClick={() =>
                           setOpenMobileSection(isOpen ? null : section.label)
                         }
+                        aria-expanded={isOpen}
                       >
                         {section.label}
                         {isOpen ? (

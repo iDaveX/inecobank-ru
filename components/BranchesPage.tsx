@@ -335,7 +335,7 @@ export function BranchesPage() {
         </Container>
       </motion.section>
 
-      <motion.section className="bg-[#F5F5F5] py-10" {...sectionMotion}>
+      <motion.section className="bg-surface py-10" {...sectionMotion}>
         <Container>
           <div className="mx-auto max-w-xl">
             <div className="relative">
@@ -390,7 +390,7 @@ export function BranchesPage() {
         </Container>
       </motion.section>
 
-      <motion.section className="bg-[#F5F5F5] pb-16" {...sectionMotion}>
+      <motion.section className="bg-surface pb-16" {...sectionMotion}>
         <Container>
           {filteredLocations.length > 0 ? (
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -406,13 +406,13 @@ export function BranchesPage() {
         </Container>
       </motion.section>
 
-      <motion.section className="bg-[#0A7C3E] py-12 text-white" {...sectionMotion}>
+      <motion.section className="bg-brand-green py-12 text-white" {...sectionMotion}>
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-2xl font-bold sm:text-3xl">
               Не нашли отделение рядом?
             </h2>
-            <p className="mt-3 text-base text-white/80">
+            <p className="mt-3 text-base text-white/90">
               Большинство услуг доступны онлайн — без похода в банк
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-4">

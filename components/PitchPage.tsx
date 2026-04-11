@@ -299,7 +299,7 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-[#F5F5F5] py-16">
+      <section className="bg-surface py-16">
         <Container>
           <motion.div {...sectionAnimation}>
             <h2 className="text-2xl font-bold text-gray-900">Что было не так</h2>
@@ -417,7 +417,7 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-[#F5F5F5] py-16">
+      <section className="bg-surface py-16">
         <Container>
           <motion.div {...sectionAnimation}>
             <h2 className="text-2xl font-bold text-gray-900">
@@ -479,7 +479,7 @@ export function PitchPage() {
             className="mt-8 overflow-hidden rounded-2xl border border-gray-100 shadow-sm"
           >
             <table className="w-full text-sm">
-              <thead className="bg-[#F5F5F5]">
+              <thead className="bg-surface">
                 <tr>
                   <th className="w-2/5 px-5 py-3 text-left font-semibold text-gray-700">
                     Проблема
@@ -516,7 +516,7 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-[#F5F5F5] py-16">
+      <section className="bg-surface py-16">
         <Container>
           <motion.div {...sectionAnimation}>
             <h2 className="text-2xl font-bold text-gray-900">Метрики успеха</h2>
@@ -580,7 +580,7 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-[#F5F5F5] py-12">
+      <section className="bg-surface py-12">
         <Container>
           <motion.div
             {...sectionAnimation}
@@ -624,7 +624,7 @@ export function PitchPage() {
         <Container>
           <motion.div {...sectionAnimation}>
             <h2 className="text-3xl font-extrabold">Готов обсудить</h2>
-            <p className="mx-auto mt-4 max-w-md text-white/80">
+            <p className="mx-auto mt-4 max-w-md text-white/90">
               Если этот редизайн показался вам интересным — я готов рассказать
               подробнее о своём продуктовом подходе.
             </p>

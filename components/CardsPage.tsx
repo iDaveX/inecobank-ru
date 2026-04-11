@@ -358,7 +358,7 @@ export function CardsPage() {
         </Container>
       </section>
 
-      <motion.section className="bg-[#F5F5F5] py-16" {...sectionMotion}>
+      <motion.section className="bg-surface py-16" {...sectionMotion}>
         <Container>
           <div className="mb-8 flex flex-wrap gap-2">
             {filters.map((filter) => {
@@ -445,7 +445,7 @@ export function CardsPage() {
                           className="px-6 py-4 text-left text-sm font-semibold text-gray-900"
                         >
                           <div
-                            className="mb-3 aspect-[1.58] w-28 rounded-md p-3 text-[10px] font-bold text-white"
+                            className="mb-3 aspect-[1.58] w-28 rounded-md p-3 text-xs font-bold text-white"
                             style={{ backgroundColor: card.color }}
                           >
                             {card.name}
@@ -528,7 +528,7 @@ export function CardsPage() {
       >
         <Container>
           <h2 className="text-3xl font-bold">Не определились с картой?</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-white/80">
+          <p className="mx-auto mt-4 max-w-2xl text-white/90">
             Позвоните нам или приходите в отделение — поможем выбрать за 10
             минут
           </p>

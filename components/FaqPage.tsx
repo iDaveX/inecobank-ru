@@ -175,6 +175,8 @@ function FaqAccordionItem({
         type="button"
         className="flex w-full items-center justify-between gap-4 px-6 py-4 text-left"
         onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={`faq-panel-${item.id}`}
       >
         <span className="text-sm font-medium text-gray-900">{item.question}</span>
         <ChevronDown
@@ -186,6 +188,7 @@ function FaqAccordionItem({
       <AnimatePresence initial={false}>
         {isOpen ? (
           <motion.div
+            id={`faq-panel-${item.id}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -234,7 +237,7 @@ export function FaqPage() {
         </Container>
       </section>
 
-      <motion.section className="bg-[#F5F5F5] py-16" {...sectionMotion}>
+      <motion.section className="bg-surface py-16" {...sectionMotion}>
         <Container>
           <div className="mx-auto mb-8 flex max-w-3xl flex-wrap gap-2">
             {categories.map((category) => {
@@ -285,10 +288,10 @@ export function FaqPage() {
         </Container>
       </motion.section>
 
-      <section className="bg-[#0A7C3E] py-12 text-center text-white">
+      <section className="bg-brand-green py-12 text-center text-white">
         <Container>
           <h2 className="text-3xl font-bold">Не нашли ответ?</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-white/80">
+          <p className="mx-auto mt-4 max-w-2xl text-white/90">
             Позвоните — ответим на любой вопрос за 5 минут
           </p>
           <a

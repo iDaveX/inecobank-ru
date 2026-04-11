@@ -122,7 +122,7 @@ export function AboutPage() {
         </Container>
       </section>
 
-      <section className="bg-[#F5F5F5] py-16">
+      <section className="bg-surface py-16">
         <Container>
           <motion.div
             {...sectionAnimation}
@@ -171,7 +171,7 @@ export function AboutPage() {
         </Container>
       </section>
 
-      <section className="bg-[#F5F5F5] py-16">
+      <section className="bg-surface py-16">
         <Container>
           <motion.div
             {...sectionAnimation}
@@ -222,7 +222,7 @@ export function AboutPage() {
             <h2 className="text-3xl font-extrabold text-white">
               Станьте клиентом INECOBANK
             </h2>
-            <p className="mt-4 text-white/80">
+            <p className="mt-4 text-white/90">
               Откройте счёт онлайн за 5 минут
             </p>
             <a

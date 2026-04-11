@@ -141,8 +141,9 @@ function InternalTransfers() {
 function DomesticTransfers() {
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
-      <table className="w-full text-sm">
-        <thead className="bg-[#F5F5F5]">
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[28rem] text-sm">
+        <thead className="bg-surface">
           <tr>
             <th className="px-4 py-3 text-left font-semibold text-gray-700">
               Способ
@@ -170,6 +171,7 @@ function DomesticTransfers() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -283,7 +285,7 @@ export function TransfersPage() {
         </Container>
       </section>
 
-      <section className="bg-[#F5F5F5] py-16">
+      <section className="bg-surface py-16">
         <Container>
           <motion.div {...sectionAnimation}>
             <h2 className="text-center text-2xl font-bold text-gray-900">
@@ -310,7 +312,7 @@ export function TransfersPage() {
         <div className="mx-auto max-w-7xl px-4 text-center text-white">
           <motion.div {...sectionAnimation}>
             <h2 className="text-3xl font-extrabold">Сделайте первый перевод</h2>
-            <p className="mt-4 text-white/80">
+            <p className="mt-4 text-white/90">
               Откройте счёт и получите 3 месяца бесплатных переводов
             </p>
             <a
