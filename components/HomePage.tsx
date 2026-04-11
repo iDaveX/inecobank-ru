@@ -88,22 +88,22 @@ const products: { title: string; text: string; cta: string; url: string; icon: I
 ];
 
 const GOALS = [
-  { id: "save", label: "Накопить", icon: PiggyBank },
-  { id: "borrow", label: "Получить кредит", icon: Wallet },
-  { id: "spend", label: "Платить картой", icon: CreditCard },
-  { id: "send", label: "Переводить деньги", icon: ArrowLeftRight },
+  { id: "save", label: "Накопить", desc: "Депозит или накопительный счёт", icon: PiggyBank },
+  { id: "borrow", label: "Получить кредит", desc: "Потребкредит или ипотека", icon: Wallet },
+  { id: "spend", label: "Платить картой", desc: "Дебетовая или кредитная карта", icon: CreditCard },
+  { id: "send", label: "Переводить деньги", desc: "По Армении и за рубеж", icon: ArrowLeftRight },
 ] as const;
 
 const TERMS = [
-  { id: "short", label: "До 6 месяцев" },
-  { id: "medium", label: "От 6 до 24 месяцев" },
-  { id: "long", label: "Более 2 лет" },
+  { id: "short", label: "До 6 месяцев", desc: "Краткосрочное решение" },
+  { id: "medium", label: "От 6 до 24 месяцев", desc: "Средний срок" },
+  { id: "long", label: "Более 2 лет", desc: "Долгосрочное планирование" },
 ] as const;
 
 const AMOUNTS = [
-  { id: "small", label: "До 500 000 AMD" },
-  { id: "medium", label: "500 000 — 5 000 000 AMD" },
-  { id: "large", label: "Более 5 000 000 AMD" },
+  { id: "small", label: "До 500 000 AMD", desc: "≈ $1 300" },
+  { id: "medium", label: "500 000 — 5 000 000 AMD", desc: "≈ $1 300 — $13 000" },
+  { id: "large", label: "Более 5 000 000 AMD", desc: "≈ от $13 000" },
 ] as const;
 
 const exchangeRates = [
@@ -614,8 +614,15 @@ function getRecommendation(state: QuizState): Recommendation {
   return { title: "Переводы", text: "Внутри Армении и за рубеж с низкой комиссией.", href: "/transfers", cta: "Узнать о переводах" };
 }
 
+const slideVariants = {
+  enter: (d: number) => ({ opacity: 0, x: d * 30 }),
+  center: { opacity: 1, x: 0 },
+  exit: (d: number) => ({ opacity: 0, x: d * -30 }),
+};
+
 function ProductQuiz() {
   const [step, setStep] = useState<QuizStep>("goal");
+  const [direction, setDirection] = useState<1 | -1>(1);
   const [quiz, setQuiz] = useState<QuizState>({
     goal: null,
     term: null,
@@ -623,17 +630,39 @@ function ProductQuiz() {
   });
   const { showToast } = useToast();
 
-  const stepIndex = step === "result" ? 2 : { goal: 0, term: 1, amount: 2 }[step];
+  // spend/send goals skip term+amount steps — go straight to result
+  const isSimpleFlow = quiz.goal === "spend" || quiz.goal === "send";
+  const totalSteps = isSimpleFlow ? 1 : 3;
+  const currentStepIndex: number =
+    step === "result" ? totalSteps : { goal: 0, term: 1, amount: 2 }[step];
+
   const rec = getRecommendation(quiz);
+
+  const go = (next: QuizStep) => { setDirection(1); setStep(next); };
+  const back = (prev: QuizStep) => { setDirection(-1); setStep(prev); };
 
   const resetQuiz = () => {
     setQuiz({ goal: null, term: null, amount: null });
+    setDirection(1);
     setStep("goal");
   };
 
   const goBack = () => {
-    if (step === "term") { setQuiz((c) => ({ ...c, term: null })); setStep("goal"); }
-    else if (step === "amount") { setQuiz((c) => ({ ...c, amount: null })); setStep("term"); }
+    if (step === "result") {
+      if (quiz.goal === "spend" || quiz.goal === "send") {
+        setQuiz((c) => ({ ...c, goal: null }));
+        back("goal");
+      } else {
+        setQuiz((c) => ({ ...c, amount: null }));
+        back("amount");
+      }
+    } else if (step === "term") {
+      setQuiz((c) => ({ ...c, term: null }));
+      back("goal");
+    } else if (step === "amount") {
+      setQuiz((c) => ({ ...c, amount: null }));
+      back("term");
+    }
   };
 
   return (
@@ -647,25 +676,36 @@ function ProductQuiz() {
             Какой продукт вам подходит?
           </h2>
           <p className="mt-3 text-gray-500">
-            Ответьте на 3 вопроса — мы подберём лучший вариант
+            {totalSteps === 1 ? "Ответьте на 1 вопрос" : `Ответьте на ${totalSteps} вопроса`} — подберём лучший вариант
           </p>
         </motion.div>
 
         <div className="mx-auto mt-10 max-w-xl">
+          {/* Progress + step counter */}
           {step !== "result" && (
-            <div className="mb-8 flex items-center gap-2">
-              {[0, 1, 2].map((index) => (
-                <div
-                  key={index}
-                  className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                    index <= stepIndex ? "bg-brand-green" : "bg-gray-200"
-                  }`}
-                />
-              ))}
+            <div className="mb-8">
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalSteps }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                      i < currentStepIndex
+                        ? "bg-brand-green"
+                        : i === currentStepIndex
+                        ? "bg-brand-green/35"
+                        : "bg-gray-200"
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 text-right text-xs text-gray-400">
+                Шаг {currentStepIndex + 1} из {totalSteps}
+              </p>
             </div>
           )}
 
-          {(step === "term" || step === "amount") && (
+          {/* Back button */}
+          {step !== "goal" && (
             <button
               type="button"
               onClick={goBack}
@@ -676,106 +716,160 @@ function ProductQuiz() {
             </button>
           )}
 
-          {step === "goal" && (
-            <div>
-              <p className="mb-4 font-semibold text-gray-900">Какова ваша цель?</p>
-              <div className="grid grid-cols-2 gap-3">
-                {GOALS.map((goal) => {
-                  const Icon = goal.icon;
-                  return (
-                    <button
-                      key={goal.id}
-                      type="button"
-                      onClick={() => { setQuiz((c) => ({ ...c, goal: goal.id })); setStep("term"); }}
-                      className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green hover:shadow-md"
-                    >
-                      <Icon className="h-6 w-6" />
-                      {goal.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {step === "term" && (
-            <div>
-              <p className="mb-4 font-semibold text-gray-900">На какой срок?</p>
-              <div className="flex flex-col gap-3">
-                {TERMS.map((term) => (
-                  <button
-                    key={term.id}
-                    type="button"
-                    onClick={() => { setQuiz((c) => ({ ...c, term: term.id })); setStep("amount"); }}
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
-                  >
-                    {term.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === "amount" && (
-            <div>
-              <p className="mb-4 font-semibold text-gray-900">Какая сумма?</p>
-              <div className="flex flex-col gap-3">
-                {AMOUNTS.map((amount) => (
-                  <button
-                    key={amount.id}
-                    type="button"
-                    onClick={() => { setQuiz((c) => ({ ...c, amount: amount.id })); setStep("result"); }}
-                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
-                  >
-                    {amount.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === "result" && (
+          <AnimatePresence mode="wait" custom={direction}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="rounded-2xl border border-brand-green/30 bg-white p-8 text-center shadow-md"
+              key={step}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.18 }}
             >
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-green/10">
-                <CheckCircle className="h-7 w-7 text-brand-green" />
-              </div>
-              <h3 className="mt-5 text-xl font-bold text-gray-900">{rec.title}</h3>
-              <p className="mt-3 text-gray-500">{rec.text}</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                {rec.href === "#" ? (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      showToast(
-                        "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
-                      )
-                    }
-                    className="rounded-lg bg-brand-green px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
-                  >
-                    {rec.cta}
-                  </button>
-                ) : (
-                  <a
-                    href={rec.href}
-                    className="rounded-lg bg-brand-green px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
-                  >
-                    {rec.cta}
-                  </a>
-                )}
-                <button
-                  type="button"
-                  onClick={resetQuiz}
-                  className="rounded-lg border border-gray-200 px-6 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-brand-green hover:text-brand-green"
-                >
-                  Пройти снова
-                </button>
-              </div>
+              {step === "goal" && (
+                <div>
+                  <p className="mb-4 font-semibold text-gray-900">Какова ваша цель?</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {GOALS.map((goal) => {
+                      const Icon = goal.icon;
+                      return (
+                        <button
+                          key={goal.id}
+                          type="button"
+                          onClick={() => {
+                            setQuiz((c) => ({ ...c, goal: goal.id }));
+                            if (goal.id === "spend" || goal.id === "send") go("result");
+                            else go("term");
+                          }}
+                          className="flex flex-col items-start gap-3 rounded-xl border border-gray-200 bg-white p-5 text-left shadow-sm transition-all hover:border-brand-green hover:shadow-md"
+                        >
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-green/10">
+                            <Icon className="h-5 w-5 text-brand-green" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{goal.label}</p>
+                            <p className="mt-0.5 text-xs text-gray-400">{goal.desc}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {step === "term" && (
+                <div>
+                  <p className="mb-4 font-semibold text-gray-900">На какой срок?</p>
+                  <div className="flex flex-col gap-3">
+                    {TERMS.map((term) => (
+                      <button
+                        key={term.id}
+                        type="button"
+                        onClick={() => { setQuiz((c) => ({ ...c, term: term.id })); go("amount"); }}
+                        className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-5 py-4 text-left shadow-sm transition-all hover:border-brand-green hover:shadow-md"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700">{term.label}</p>
+                          <p className="mt-0.5 text-xs text-gray-400">{term.desc}</p>
+                        </div>
+                        <ChevronLeft className="h-4 w-4 rotate-180 text-gray-300" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === "amount" && (
+                <div>
+                  <p className="mb-4 font-semibold text-gray-900">Какая сумма?</p>
+                  <div className="flex flex-col gap-3">
+                    {AMOUNTS.map((amount) => (
+                      <button
+                        key={amount.id}
+                        type="button"
+                        onClick={() => { setQuiz((c) => ({ ...c, amount: amount.id })); go("result"); }}
+                        className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-5 py-4 text-left shadow-sm transition-all hover:border-brand-green hover:shadow-md"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700">{amount.label}</p>
+                          <p className="mt-0.5 text-xs text-gray-400">{amount.desc}</p>
+                        </div>
+                        <ChevronLeft className="h-4 w-4 rotate-180 text-gray-300" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {step === "result" && (
+                <div className="rounded-2xl border border-brand-green/30 bg-white p-8 shadow-md">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
+                      <CheckCircle className="h-6 w-6 text-brand-green" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-brand-green">
+                        Рекомендация готова
+                      </p>
+                      <h3 className="text-xl font-bold text-gray-900">{rec.title}</h3>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-gray-500">{rec.text}</p>
+
+                  {/* What happens next */}
+                  <div className="mt-6 rounded-xl bg-gray-50 px-5 py-4">
+                    <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-gray-400">
+                      Что дальше
+                    </p>
+                    <div className="flex flex-col gap-2.5">
+                      {[
+                        `Нажмите «${rec.cta}»`,
+                        "Заполните анкету за 2 минуты",
+                        "Получите решение за 40 секунд",
+                      ].map((text, i) => (
+                        <div key={text} className="flex items-center gap-3">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-green text-[10px] font-bold text-white">
+                            {i + 1}
+                          </span>
+                          <span className="text-sm text-gray-600">{text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                    {rec.href === "#" ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          showToast(
+                            "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
+                          )
+                        }
+                        className="flex-1 rounded-lg bg-brand-green px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
+                      >
+                        {rec.cta}
+                      </button>
+                    ) : (
+                      <a
+                        href={rec.href}
+                        className="flex-1 rounded-lg bg-brand-green px-6 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
+                      >
+                        {rec.cta}
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      onClick={resetQuiz}
+                      className="rounded-lg border border-gray-200 px-6 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-brand-green hover:text-brand-green"
+                    >
+                      Пройти снова
+                    </button>
+                  </div>
+                </div>
+              )}
             </motion.div>
-          )}
+          </AnimatePresence>
         </div>
       </Container>
     </Section>
@@ -961,7 +1055,7 @@ export function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="group relative overflow-hidden rounded-2xl bg-surface p-7 transition-shadow hover:shadow-md"
+                className="group relative overflow-hidden rounded-2xl bg-surface p-7 shadow-sm ring-1 ring-black/[0.06] transition-shadow hover:shadow-md"
               >
                 <Icon className="absolute -right-4 -top-4 h-32 w-32 text-brand-green/[0.08] transition-transform duration-500 group-hover:scale-110" />
                 <div className="relative mt-2">

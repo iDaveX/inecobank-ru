@@ -150,10 +150,10 @@ const SOLUTIONS = [
 ];
 
 const EXECUTIVE_SUMMARY = [
-  "Нашёл 6 точек потерь на текущем inecobank.am",
-  "Сформулировал 4 продуктовые гипотезы и метрики успеха",
-  "Собрал работающий прототип вместо презентации с рекомендациями",
-  "Следующий шаг: аналитика, compliance review и A/B-тесты",
+  "Обнаружил потенциальные потери ~+1 200 заявок в месяц",
+  "4 гипотезы с метриками успеха и чётким планом A/B-тестов",
+  "Рабочий прототип вместо слайдов с рекомендациями",
+  "Следующий шаг — за вами: готов к встрече или ревью",
 ];
 
 const METRICS: Metric[] = [
@@ -421,24 +421,101 @@ export function PitchPage() {
         </div>
       </header>
 
-      <section className="bg-white py-20 text-center">
-        <Container>
-          <motion.div {...sectionAnimation}>
-            <p className="text-sm font-semibold tracking-widest text-brand-green uppercase">
-              Инициативный проект
-            </p>
-            <h1 className="mt-4 text-4xl font-extrabold text-gray-950 sm:text-5xl">
-              Редизайн inecobank.am
-            </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-gray-500">
-              Меня зовут Давид. Готовясь к разговору с вами, я открыл
-              inecobank.am и обнаружил шесть точек, где банк теряет клиентов:
-              от отсутствия калькуляторов до слабой мобильной версии. Я не стал
-              делать презентацию с рекомендациями — я построил работающий сайт
-              со всеми исправлениями. Без команды и дизайнеров. За 3 часа.
-            </p>
-          </motion.div>
-        </Container>
+      <section className="bg-white py-16 lg:py-24">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-start lg:gap-16">
+            {/* Left: text */}
+            <motion.div {...sectionAnimation} className="flex-1 min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">
+                Отклик на вакансию · Product Manager · INECOBANK
+              </p>
+              <h1 className="mt-4 text-4xl font-extrabold leading-tight text-gray-950 lg:text-5xl">
+                Нашёл 6 точек потерь на inecobank.am — и устранил их.
+              </h1>
+              <p className="mt-5 text-lg text-gray-500">
+                Вместо слайдов — рабочий прототип со всеми исправлениями.
+                Без команды и дизайнеров.
+              </p>
+
+              {/* Stats — main page style */}
+              <div className="mt-8 flex items-center gap-6">
+                <div>
+                  <p className="text-2xl font-extrabold text-gray-900">3 часа</p>
+                  <p className="text-xs text-gray-400">от анализа до деплоя</p>
+                </div>
+                <div className="h-10 w-px bg-gray-100" aria-hidden="true" />
+                <div>
+                  <p className="text-2xl font-extrabold text-gray-900">+1 200</p>
+                  <p className="text-xs text-gray-400">заявок/мес — потенциал</p>
+                </div>
+                <div className="h-10 w-px bg-gray-100" aria-hidden="true" />
+                <div>
+                  <p className="text-2xl font-extrabold text-gray-900">6</p>
+                  <p className="text-xs text-gray-400">точек потерь</p>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a
+                  href="mailto:galoyandavid8@gmail.com"
+                  className="rounded-md bg-brand-green px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
+                >
+                  Написать Давиду →
+                </a>
+                <Link
+                  href="/"
+                  className="rounded-md border border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-brand-green hover:text-brand-green"
+                >
+                  Посмотреть сайт
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* Right: PM card */}
+            <motion.div
+              {...sectionAnimation}
+              className="w-full shrink-0 lg:w-72 xl:w-80"
+            >
+              <div className="relative overflow-hidden rounded-2xl bg-brand-dark p-7 text-white shadow-xl">
+                {/* Decorative circle */}
+                <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand-green/20" />
+                <div className="absolute -bottom-6 -left-6 h-28 w-28 rounded-full bg-white/5" />
+
+                <div className="relative">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">
+                    Product Manager · Кандидат
+                  </p>
+                  <p className="mt-3 text-xl font-extrabold text-white">
+                    Давид Галоян
+                  </p>
+                  <p className="text-sm text-white/60">Москва · Армения</p>
+
+                  <div className="mt-6 space-y-3 border-t border-white/10 pt-5">
+                    {[
+                      { label: "Product Audit", value: "6 точек потерь" },
+                      { label: "Потенциал роста", value: "+1 200 заявок/мес" },
+                      { label: "Time to ship", value: "3 часа" },
+                      { label: "Методология", value: "JTBD · CJM · A/B" },
+                    ].map((row) => (
+                      <div key={row.label} className="flex items-center justify-between gap-4">
+                        <p className="text-xs text-white/50">{row.label}</p>
+                        <p className="text-sm font-semibold text-white">{row.value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
+                    <p className="text-xs text-white/40">galoyandavid8@gmail.com</p>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-green">
+                      <span className="text-xs font-bold text-white">ДГ</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
       <section className="bg-surface py-12">
@@ -464,48 +541,68 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-surface py-16">
+      <section className="bg-white py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">Что было не так</h2>
-            <p className="mt-2 text-gray-500">Анализ текущего inecobank.am</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Мотивация</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Почему INECOBANK</h2>
+            <p className="mt-2 text-gray-500">Это не ковровая рассылка — я выбрал вас осознанно</p>
           </motion.div>
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {PROBLEMS.map((problem) => {
-              const Icon = problem.icon;
-
-              return (
-                <motion.div
-                  key={problem.title}
-                  {...sectionAnimation}
-                  className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50">
-                    <Icon className="h-5 w-5 text-red-500" />
-                  </div>
-                  <h3 className="mt-4 font-bold text-gray-900">
-                    {problem.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-gray-600">{problem.text}</p>
-                  <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600">
-                    {problem.impact}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
+          <motion.div {...sectionAnimation} className="mt-8 space-y-6 border-t border-gray-100 pt-6">
+            {[
+              {
+                label: "Топ-3 банк Армении",
+                text: "INECOBANK — крупный розничный игрок с реальной цифровой аудиторией. Проблемы сайта влияют на тысячи заявок, а не на десятки. Здесь есть что менять и есть смысл это мерить.",
+              },
+              {
+                label: "Конкретные точки роста",
+                text: "Я вижу где и почему теряются клиенты: отсутствие калькуляторов, слабый мобайл, нет подбора продукта. Это не гипотезы из воздуха — я проверил каждую на бенчмарках.",
+              },
+              {
+                label: "Вакансия совпадает с тем, как я работаю",
+                text: "Product lifecycle, digital journeys, A/B-тесты, гипотезы с метриками — именно этим я занимался в этом кейсе. Не готовился к вакансии по шаблону, а показал это в работе.",
+              },
+            ].map((item) => (
+              <div key={item.label} className="grid grid-cols-1 gap-1 sm:grid-cols-[200px_1fr] sm:gap-8">
+                <p className="font-semibold text-gray-900">{item.label}</p>
+                <p className="text-gray-500 leading-relaxed">{item.text}</p>
+              </div>
+            ))}
+          </motion.div>
         </Container>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-surface py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Приоритизация
-            </h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Product Audit</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Что было не так</h2>
+            <p className="mt-2 text-gray-500">Анализ текущего inecobank.am</p>
+          </motion.div>
+          <motion.div {...sectionAnimation} className="mt-8 divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white shadow-sm">
+            {PROBLEMS.map((problem, index) => (
+              <div key={problem.title} className="grid grid-cols-[2rem_1fr_auto] items-start gap-4 px-6 py-5">
+                <span className="text-sm font-bold text-gray-300">0{index + 1}</span>
+                <div>
+                  <p className="font-semibold text-gray-900">{problem.title}</p>
+                  <p className="mt-1 text-sm text-gray-500">{problem.text}</p>
+                </div>
+                <span className="shrink-0 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-500 whitespace-nowrap hidden sm:block">
+                  {problem.impact.split("—")[0].trim()}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-14 lg:py-20">
+        <Container>
+          <motion.div {...sectionAnimation}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">ICE-scoring</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Приоритизация</h2>
             <p className="mt-2 text-gray-500">
-              Что запускать первым, если цель — быстро проверить влияние на
-              заявки
+              Что запускать первым, если цель — быстро проверить влияние на заявки
             </p>
           </motion.div>
           <div className="mt-8 overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
@@ -555,15 +652,12 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-white py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Как пользователь доходит до заявки
-            </h2>
-            <p className="mt-2 text-gray-500">
-              Воронка, которую решает этот редизайн
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Воронка</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Как пользователь доходит до заявки</h2>
+            <p className="mt-2 text-gray-500">Воронка, которую решает этот редизайн</p>
           </motion.div>
 
           <div className="mt-10 hidden items-start gap-2 sm:flex">
@@ -640,15 +734,12 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-surface py-16">
+      <section className="bg-surface py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Продуктовые гипотезы
-            </h2>
-            <p className="mt-2 text-gray-500">
-              Что должна подтвердить или опровергнуть каждая фича
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Гипотезы</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Продуктовые гипотезы</h2>
+            <p className="mt-2 text-gray-500">Что должна подтвердить или опровергнуть каждая фича</p>
           </motion.div>
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
             {HYPOTHESES.map((item) => (
@@ -689,84 +780,67 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-white py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">
-              План валидации
-            </h2>
-            <p className="mt-2 text-gray-500">
-              Какие события я бы завёл перед A/B-тестом
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Аналитика</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">План валидации</h2>
+            <p className="mt-2 text-gray-500">Какие события я бы завёл перед A/B-тестом</p>
           </motion.div>
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {ANALYTICS_EVENTS.map((item) => (
-              <motion.div
-                key={item.event}
-                {...sectionAnimation}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
-              >
-                <p className="font-mono text-sm font-semibold text-brand-green">
-                  {item.event}
-                </p>
-                <p className="mt-2 text-sm text-gray-600">{item.why}</p>
-              </motion.div>
-            ))}
-          </div>
-          <div className="mt-8 rounded-2xl border border-gray-100 bg-[#F5F5F5] p-6">
-            <h3 className="font-bold text-gray-900">Guardrail metrics</h3>
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {GUARDRAILS.map((item) => (
-                <div key={item.metric}>
-                  <p className="text-sm font-semibold text-gray-900">
-                    {item.metric}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-gray-500">
-                    {item.reason}
-                  </p>
+          <motion.div {...sectionAnimation} className="mt-8 rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+            <div className="divide-y divide-gray-50">
+              {ANALYTICS_EVENTS.map((item) => (
+                <div key={item.event} className="flex items-start gap-4 px-6 py-4">
+                  <code className="shrink-0 rounded bg-brand-green/8 px-2 py-0.5 font-mono text-xs font-semibold text-brand-green">
+                    {item.event}
+                  </code>
+                  <p className="text-sm text-gray-500">{item.why}</p>
                 </div>
               ))}
             </div>
-          </div>
-        </Container>
-      </section>
-
-      <section className="bg-[#F5F5F5] py-16">
-        <Container>
-          <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Что не запускать сразу
-            </h2>
-            <p className="mt-2 text-gray-500">
-              Ограничения, которые я бы зафиксировал до полноценного релиза
-            </p>
+            <div className="border-t border-gray-100 bg-surface px-6 py-5">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Guardrail metrics</p>
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {GUARDRAILS.map((item) => (
+                  <div key={item.metric}>
+                    <p className="text-sm font-semibold text-gray-700">{item.metric}</p>
+                    <p className="mt-0.5 text-xs leading-5 text-gray-400">{item.reason}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </motion.div>
-          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
-            {LAUNCH_RISKS.map((item) => (
-              <motion.div
-                key={item.item}
-                {...sectionAnimation}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
-              >
-                <p className="text-sm font-bold text-gray-900">{item.item}</p>
-                <p className="mt-2 text-sm leading-6 text-gray-500">
-                  {item.reason}
-                </p>
-              </motion.div>
-            ))}
-          </div>
         </Container>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-surface py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Сценарий бизнес-эффекта
-            </h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Риски</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Что не запускать сразу</h2>
+            <p className="mt-2 text-gray-500">Ограничения, которые я бы зафиксировал до полноценного релиза</p>
+          </motion.div>
+          <motion.div {...sectionAnimation} className="mt-8 space-y-4">
+            {LAUNCH_RISKS.map((item) => (
+              <div key={item.item} className="flex gap-4">
+                <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-gray-300" />
+                <div>
+                  <p className="font-semibold text-gray-900">{item.item}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-gray-500">{item.reason}</p>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-14 lg:py-20">
+        <Container>
+          <motion.div {...sectionAnimation}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Бизнес-эффект</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Сценарий бизнес-эффекта</h2>
             <p className="mt-2 text-gray-500">
-              Не прогноз, а пример модели, которую я бы проверил на реальных
-              данных
+              Не прогноз, а пример модели, которую я бы проверил на реальных данных
             </p>
           </motion.div>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
@@ -774,7 +848,7 @@ export function PitchPage() {
               <motion.div
                 key={item.label}
                 {...sectionAnimation}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+                className="rounded-2xl border border-gray-100 bg-surface p-5 shadow-sm ring-1 ring-black/[0.06]"
               >
                 <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
                   {item.label}
@@ -793,14 +867,12 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-white py-14 lg:py-20">
         <Container>
-          <motion.h2
-            {...sectionAnimation}
-            className="text-2xl font-bold text-gray-900"
-          >
-            Что изменилось
-          </motion.h2>
+          <motion.div {...sectionAnimation}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Решения</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Что изменилось</h2>
+          </motion.div>
           <motion.div
             {...sectionAnimation}
             className="mt-8 overflow-hidden rounded-2xl border border-gray-100 shadow-sm"
@@ -843,53 +915,36 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-surface py-16">
+      <section className="bg-surface py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">Метрики успеха</h2>
-            <p className="mt-2 text-gray-500">
-              Что должен улучшить этот редизайн — и как это измерить
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">KPI</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Метрики успеха</h2>
+            <p className="mt-2 text-gray-500">Что должен улучшить этот редизайн — и как это измерить</p>
           </motion.div>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div {...sectionAnimation} className="mt-8 divide-y divide-gray-100 rounded-2xl border border-gray-100 bg-white shadow-sm">
             {METRICS.map((metric) => (
-              <motion.div
-                key={metric.metric}
-                {...sectionAnimation}
-                className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
-              >
-                <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
-                  {metric.metric}
-                </p>
-                <div className="mt-3 flex items-end gap-3">
-                  <span className="text-2xl font-extrabold text-gray-300 line-through">
-                    {metric.current}
-                  </span>
-                  <span className="text-3xl font-extrabold text-brand-green">
-                    {metric.target}
-                  </span>
+              <div key={metric.metric} className="grid grid-cols-[1fr_auto] items-center gap-6 px-6 py-5 sm:grid-cols-[180px_1fr_auto]">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{metric.metric}</p>
+                <p className="hidden text-sm text-gray-500 sm:block">{metric.how}</p>
+                <div className="flex items-baseline gap-2 text-right">
+                  <span className="text-sm text-gray-300 line-through">{metric.current}</span>
+                  <span className="text-xl font-extrabold text-brand-green">{metric.target}</span>
                 </div>
-                <p className="mt-3 text-sm text-gray-500">{metric.how}</p>
-                {metric.estimated ? (
-                  <p className="mt-1 text-xs text-gray-400 italic">
-                    * Текущий показатель — оценочный, на основе анализа воронки.
-                    Точные данные — после подключения GA4.
-                  </p>
-                ) : null}
-              </motion.div>
+              </div>
             ))}
-          </div>
-          <p className="mt-6 text-xs text-gray-400">
-            * Текущие показатели — оценочные, на основе визуального анализа
-            воронки. Точные данные доступны после подключения аналитики.
+          </motion.div>
+          <p className="mt-4 text-xs text-gray-400">
+            * Показатели оценочные, на основе анализа воронки. Точные данные — после подключения GA4.
           </p>
         </Container>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-white py-14 lg:py-20">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-2xl font-bold text-gray-900">Что дальше</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Roadmap</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Что дальше</h2>
             <p className="mt-2 text-gray-500">Следующие шаги после запуска</p>
           </motion.div>
           <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -897,7 +952,7 @@ export function PitchPage() {
               <motion.div
                 key={roadmap.quarter}
                 {...sectionAnimation}
-                className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                className="rounded-2xl border border-gray-100 bg-surface p-6 shadow-sm ring-1 ring-black/[0.06]"
               >
                 <p className="font-bold text-brand-green">{roadmap.quarter}</p>
                 <ul className="mt-4 space-y-3">
@@ -917,52 +972,24 @@ export function PitchPage() {
         </Container>
       </section>
 
-      <section className="bg-surface py-12">
+      <section className="bg-surface py-14 lg:py-20">
         <Container>
-          <motion.div
-            {...sectionAnimation}
-            className="grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-2"
-          >
-            <div>
-              <h3 className="font-bold text-gray-900">Стек</h3>
-              <p className="mt-2 text-sm text-gray-500">
-                Умею собирать прототипы самостоятельно — это ускоряет discovery
-                и снижает стоимость экспериментов.
-              </p>
-              <ul className="mt-4 space-y-2">
-                {STACK.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-center gap-2 text-sm text-gray-600"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-brand-green" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-gray-900">Процесс</h3>
-              <ul className="mt-4 space-y-2">
-                {PROCESS.map((item, index) => (
-                  <li
-                    key={item}
-                    className="flex items-center gap-2 text-sm text-gray-600"
-                  >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-green/10 text-xs font-bold text-brand-green">
-                      {index + 1}
-                    </span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <motion.div {...sectionAnimation}>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-green">Как я работаю</p>
+            <h2 className="mt-3 text-3xl font-bold text-gray-950">Процесс</h2>
           </motion.div>
-          <p className="mt-4 text-xs text-gray-400">
-            В реальном проекте этот редизайн прошёл бы discovery-сессии с
-            командой, согласование с compliance и поэтапный A/B-тест перед
-            полным запуском. Прототип — это способ проверить направление, а не
-            готовое решение.
+          <motion.div {...sectionAnimation} className="mt-8 space-y-0 divide-y divide-gray-100">
+            {PROCESS.map((item, index) => (
+              <div key={item} className="flex items-start gap-5 py-4">
+                <span className="w-6 shrink-0 text-right text-sm font-bold text-gray-200">{index + 1}</span>
+                <p className="text-sm leading-relaxed text-gray-700">{item}</p>
+              </div>
+            ))}
+          </motion.div>
+          <p className="mt-6 text-xs text-gray-400">
+            Умею читать код, написать SQL-запрос и задеплоить прототип — это снижает
+            стоимость discovery. В реальном проекте этот редизайн прошёл бы
+            discovery-сессии с командой и согласование с compliance.
           </p>
         </Container>
       </section>
@@ -970,30 +997,34 @@ export function PitchPage() {
       <section className="bg-brand-green py-20 text-center text-white">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-3xl font-extrabold">
-              Ищу роль Product Manager
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+              Готов к встрече
+            </p>
+            <h2 className="mt-3 text-3xl font-extrabold lg:text-4xl">
+              Хочу стать вашим Product Manager
             </h2>
             <p className="mx-auto mt-4 max-w-md text-white/80">
-              Этот редизайн — пример того, как я работаю: нахожу проблему,
-              формулирую гипотезы, строю решение и измеряю результат. Готов
-              прийти на встречу и рассказать подробнее.
+              Этот кейс — не тестовое задание, которое я сделал по запросу.
+              Я открыл ваш сайт, нашёл проблемы и построил решение — потому что
+              именно так работаю. Готов обсудить, как применить этот подход
+              к вашим продуктам.
             </p>
-            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <a
                 href="mailto:galoyandavid8@gmail.com"
-                className="rounded-lg bg-white px-8 py-3 text-sm font-semibold text-brand-green transition-colors hover:bg-gray-100"
+                className="rounded-md bg-white px-8 py-3 text-sm font-semibold text-brand-green transition-colors hover:bg-gray-100"
               >
                 Написать письмо
               </a>
-              <Link
-                href="/"
-                className="rounded-lg border border-white/40 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              <a
+                href="tel:+79044049797"
+                className="rounded-md border border-white/40 px-8 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
               >
-                Открыть сайт
-              </Link>
+                +7 904 404 9797
+              </a>
             </div>
-            <p className="mt-8 text-sm text-white/60">
-              Давид Галоян · Москва · +79044049797
+            <p className="mt-8 text-sm text-white/50">
+              Давид Галоян · Product Manager · Москва
             </p>
           </motion.div>
         </Container>
