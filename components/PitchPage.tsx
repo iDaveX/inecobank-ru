@@ -45,6 +45,14 @@ type Hypothesis = {
   test: string;
 };
 
+type Metric = {
+  metric: string;
+  current: string;
+  target: string;
+  how: string;
+  estimated: boolean;
+};
+
 const PROBLEMS: Problem[] = [
   {
     icon: Calculator,
@@ -118,36 +126,41 @@ const SOLUTIONS = [
   },
 ];
 
-const METRICS = [
+const METRICS: Metric[] = [
   {
     metric: "Bounce rate",
     current: "~68%",
     target: "< 48%",
     how: "Бенчмарк для банков с калькуляторами — 45–50%. Взял верхнюю границу как консервативную цель.",
+    estimated: true,
   },
   {
     metric: "Конверсия в заявку",
     current: "~0.8%",
     target: "> 2%",
     how: "Средний показатель по розничным банкам СНГ — 1.5–3%. Цель — нижняя граница рынка.",
+    estimated: true,
   },
   {
     metric: "Мобильная конверсия",
     current: "~0.3%",
     target: "> 1%",
     how: "60%+ трафика — мобайл. Mobile-first редизайн стандартно даёт рост конверсии в 2–3×.",
+    estimated: true,
   },
   {
     metric: "Время на странице",
     current: "~35 сек",
     target: "> 80 сек",
     how: "Интерактивный калькулятор увеличивает time-on-page в 2× — данные CXL Institute по финансовым сайтам.",
+    estimated: true,
   },
   {
     metric: "Звонки в колл-центр",
     current: "база",
     target: "−20%",
     how: "Структурированный FAQ со строкой поиска снижает обращения на 15–25% — Gartner, 2023.",
+    estimated: false,
   },
 ];
 
@@ -171,7 +184,7 @@ const FUNNEL: FunnelStep[] = [
     label: "Страница продукта",
     detail: "Калькулятор, условия, CTA-кнопка",
     icon: FileText,
-    loss: null,
+    loss: "~70% уходят, не оставив заявку",
   },
   {
     step: "4",
@@ -247,12 +260,12 @@ const STACK = [
 ];
 
 const PROCESS = [
-  "Анализ текущего сайта",
-  "Составление ТЗ по каждой странице",
-  "Вёрстка и реализация",
-  "Проверка в браузере и на мобильном",
-  "Деплой на Vercel",
-  "Итого: 3 часа от идеи до готового сайта",
+  "Discovery: анализ текущего сайта, выявление точек потерь",
+  "Формулировка гипотез и метрик успеха для каждой фичи",
+  "Приоритизация: что даёт максимальный эффект за минимальное время",
+  "Прототип: собрал рабочий сайт самостоятельно, без команды",
+  "Деплой и готовность к A/B-тестированию",
+  "Итого: от анализа до работающего продукта — 3 часа",
 ];
 
 const sectionAnimation = {
@@ -290,10 +303,11 @@ export function PitchPage() {
               Редизайн inecobank.am
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg text-gray-500">
-              Меня зовут Давид. Когда я готовился к разговору с вами, я открыл
-              inecobank.am — и понял, что могу сделать лучше. Не презентацию с
-              идеями, а настоящий работающий сайт. За 3 часа, без команды, без
-              дизайнеров. Это мой способ показать, как я работаю.
+              Меня зовут Давид. Готовясь к разговору с вами, я открыл
+              inecobank.am и обнаружил шесть точек, где банк теряет клиентов:
+              от отсутствия калькуляторов до слабой мобильной версии. Я не стал
+              делать презентацию с рекомендациями — я построил работающий сайт
+              со всеми исправлениями. Без команды и дизайнеров. За 3 часа.
             </p>
           </motion.div>
         </Container>
@@ -543,9 +557,19 @@ export function PitchPage() {
                   </span>
                 </div>
                 <p className="mt-3 text-sm text-gray-500">{metric.how}</p>
+                {metric.estimated ? (
+                  <p className="mt-1 text-xs text-gray-400 italic">
+                    * Текущий показатель — оценочный, на основе анализа воронки.
+                    Точные данные — после подключения GA4.
+                  </p>
+                ) : null}
               </motion.div>
             ))}
           </div>
+          <p className="mt-6 text-xs text-gray-400">
+            * Текущие показатели — оценочные, на основе визуального анализа
+            воронки. Точные данные доступны после подключения аналитики.
+          </p>
         </Container>
       </section>
 
@@ -588,6 +612,10 @@ export function PitchPage() {
           >
             <div>
               <h3 className="font-bold text-gray-900">Стек</h3>
+              <p className="mt-2 text-sm text-gray-500">
+                Умею собирать прототипы самостоятельно — это ускоряет discovery
+                и снижает стоимость экспериментов.
+              </p>
               <ul className="mt-4 space-y-2">
                 {STACK.map((item) => (
                   <li
@@ -617,16 +645,25 @@ export function PitchPage() {
               </ul>
             </div>
           </motion.div>
+          <p className="mt-4 text-xs text-gray-400">
+            В реальном проекте этот редизайн прошёл бы discovery-сессии с
+            командой, согласование с compliance и поэтапный A/B-тест перед
+            полным запуском. Прототип — это способ проверить направление, а не
+            готовое решение.
+          </p>
         </Container>
       </section>
 
       <section className="bg-brand-green py-20 text-center text-white">
         <Container>
           <motion.div {...sectionAnimation}>
-            <h2 className="text-3xl font-extrabold">Готов обсудить</h2>
+            <h2 className="text-3xl font-extrabold">
+              Ищу роль Product Manager
+            </h2>
             <p className="mx-auto mt-4 max-w-md text-white/80">
-              Если этот редизайн показался вам интересным — я готов рассказать
-              подробнее о своём продуктовом подходе.
+              Этот редизайн — пример того, как я работаю: нахожу проблему,
+              формулирую гипотезы, строю решение и измеряю результат. Готов
+              прийти на встречу и рассказать подробнее.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
               <a
