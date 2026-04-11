@@ -19,6 +19,7 @@ import {
 import { motion } from "framer-motion";
 import { useState } from "react";
 import type { ComponentType, ReactNode } from "react";
+import { useToast } from "@/components/Toast";
 
 type IconComponent = ComponentType<{ className?: string }>;
 type QuizStep = "goal" | "term" | "amount" | "result";
@@ -47,11 +48,14 @@ const sectionAnimation = {
 };
 
 const quickActions = [
-  { label: "Переводы", icon: ArrowLeftRight },
-  { label: "Платежи", icon: Receipt },
-  { label: "Карты", icon: CreditCard },
-  { label: "Депозиты", icon: PiggyBank },
-  { label: "Ипотека", icon: HomeIcon },
+  { label: "Переводы", icon: ArrowLeftRight, href: "/transfers" },
+  {
+    label: "Обмен валют",
+    icon: Receipt,
+    toast: "Актуальный курс — в разделе «Переводы»",
+  },
+  { label: "Депозиты", icon: PiggyBank, href: "/deposits" },
+  { label: "Кредиты", icon: Banknote, href: "/loans" },
 ];
 
 const products = [
@@ -59,24 +63,28 @@ const products = [
     title: "Банковские карты",
     text: "Visa, Mastercard и ArCa для покупок в Армении и за рубежом. Кешбэк, бонусы, бесплатное обслуживание.",
     href: "Выбрать карту →",
+    url: "/cards",
     icon: CreditCard,
   },
   {
     title: "Кредиты",
     text: "От 17% годовых. Решение за 1 минуту онлайн. Сумма до 10 000 000 AMD без залога.",
     href: "Рассчитать кредит →",
+    url: "/loans",
     icon: Banknote,
   },
   {
     title: "Депозиты",
     text: "До 10% годовых в AMD. Ежемесячная выплата процентов. Онлайн-открытие за 5 минут.",
     href: "Открыть депозит →",
+    url: "/deposits",
     icon: TrendingUp,
   },
   {
     title: "Ипотека",
     text: "Ставка от 8.5% годовых. До 30 лет. Государственные программы льготного кредитования.",
     href: "Узнать условия →",
+    url: "/mortgage",
     icon: HomeIcon,
   },
 ];
@@ -168,16 +176,46 @@ function Container({ children }: { children: ReactNode }) {
   );
 }
 
-function IconCard({ label, icon: Icon }: { label: string; icon: IconComponent }) {
+function IconCard({
+  label,
+  icon: Icon,
+  href,
+  toast,
+}: {
+  label: string;
+  icon: IconComponent;
+  href?: string;
+  toast?: string;
+}) {
+  const { showToast } = useToast();
+
+  if (href) {
+    return (
+      <motion.a
+        href={href}
+        whileHover={{ y: -4 }}
+        className="flex min-h-28 flex-col items-center justify-center gap-3 rounded-lg bg-white p-4 text-center shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
+      >
+        <Icon className="h-7 w-7 text-brand-green" />
+        <span className="text-sm font-semibold text-gray-800">{label}</span>
+      </motion.a>
+    );
+  }
+
   return (
-    <motion.a
-      href="#"
+    <motion.button
+      type="button"
+      onClick={() => {
+        if (toast) {
+          showToast(toast, "info");
+        }
+      }}
       whileHover={{ y: -4 }}
       className="flex min-h-28 flex-col items-center justify-center gap-3 rounded-lg bg-white p-4 text-center shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
     >
       <Icon className="h-7 w-7 text-brand-green" />
       <span className="text-sm font-semibold text-gray-800">{label}</span>
-    </motion.a>
+    </motion.button>
   );
 }
 
@@ -238,6 +276,7 @@ function ProductQuiz() {
     term: null,
     amount: null,
   });
+  const { showToast } = useToast();
 
   const stepIndex =
     step === "result" ? 2 : { goal: 0, term: 1, amount: 2 }[step];
@@ -386,12 +425,26 @@ function ProductQuiz() {
               </h3>
               <p className="mt-3 text-gray-500">{rec.text}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <a
-                  href={rec.href}
-                  className="rounded-lg bg-brand-green px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
-                >
-                  {rec.cta}
-                </a>
+                {rec.href === "#" ? (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      showToast(
+                        "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
+                      )
+                    }
+                    className="rounded-lg bg-brand-green px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
+                  >
+                    {rec.cta}
+                  </button>
+                ) : (
+                  <a
+                    href={rec.href}
+                    className="rounded-lg bg-brand-green px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
+                  >
+                    {rec.cta}
+                  </a>
+                )}
                 <button
                   type="button"
                   onClick={resetQuiz}
@@ -463,6 +516,8 @@ function BankCard() {
 }
 
 export function HomePage() {
+  const { showToast } = useToast();
+
   return (
     <>
       <section className="relative min-h-screen overflow-hidden bg-white pt-20">
@@ -478,18 +533,29 @@ export function HomePage() {
                 <br />в Армении и за её пределами
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  onClick={() =>
+                    showToast(
+                      "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
+                    )
+                  }
                   className="rounded-lg bg-brand-green px-6 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
                 >
                   Открыть счёт бесплатно
-                </a>
-                <a
-                  href="#"
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    showToast(
+                      "Перейдите в раздел «Продукты» в меню навигации",
+                      "info",
+                    )
+                  }
                   className="rounded-lg border border-brand-green px-6 py-3 text-center text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green hover:text-white"
                 >
                   Узнать о продуктах
-                </a>
+                </button>
               </div>
               <div className="mt-10">
                 <p className="text-sm font-semibold text-gray-500">
@@ -545,7 +611,7 @@ export function HomePage() {
                 </h3>
                 <p className="mt-3 leading-7 text-gray-600">{product.text}</p>
                 <a
-                  href="#"
+                  href={product.url}
                   className="mt-5 inline-flex text-sm font-semibold text-brand-green hover:text-brand-green-light"
                 >
                   {product.href}
@@ -594,12 +660,18 @@ export function HomePage() {
               </table>
             </div>
             <div className="border-t border-gray-100 px-5 py-4">
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() =>
+                  showToast(
+                    "Доступно в мобильном приложении INECOBANK",
+                    "info",
+                  )
+                }
                 className="inline-flex rounded-lg border border-brand-green px-5 py-2.5 text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green hover:text-white"
               >
                 Полная таблица курсов
-              </a>
+              </button>
             </div>
           </div>
         </Container>
@@ -684,12 +756,15 @@ export function HomePage() {
             ))}
           </div>
           <div className="mt-8 text-center">
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={() =>
+                showToast("Доступно в мобильном приложении INECOBANK", "info")
+              }
               className="inline-flex rounded-lg border border-brand-green px-6 py-3 text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green hover:text-white"
             >
               Все новости
-            </a>
+            </button>
           </div>
         </Container>
       </Section>

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check, Globe, Laptop, PiggyBank, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
+import { useToast } from "@/components/Toast";
 
 type DepositType = "classic" | "online" | "cumulative" | "multiCurrency";
 type Currency = "AMD" | "USD";
@@ -224,6 +225,7 @@ export function DepositsPage() {
   const [currency, setCurrency] = useState<Currency>("AMD");
   const [amount, setAmount] = useState(1_500_000);
   const [term, setTerm] = useState(6);
+  const { showToast } = useToast();
 
   const amountConfig = AMOUNT_CONFIG[depositType][currency]!;
   const rate = DEPOSIT_RATES[depositType][currency]!;
@@ -459,12 +461,17 @@ export function DepositsPage() {
                   value={formatMoney(result.total, currency)}
                 />
               </div>
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() =>
+                  showToast(
+                    "Заявка принята. Менеджер свяжется с вами в течение дня.",
+                  )
+                }
                 className="mt-6 block w-full rounded-lg bg-brand-green py-3 text-center font-semibold text-white transition-colors hover:bg-brand-green-light"
               >
                 Открыть депозит
-              </a>
+              </button>
               <p className="mt-4 text-sm leading-6 text-gray-500">
                 Расчёт носит информационный характер. Точные условия — после
                 консультации с менеджером.

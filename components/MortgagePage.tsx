@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { BadgeCheck, Check, FileText, Home, RefreshCw } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
+import { useToast } from "@/components/Toast";
 
 type ProgramType = "standard" | "subsidized" | "refinance";
 type IconComponent = ComponentType<{ className?: string }>;
@@ -225,6 +226,7 @@ export function MortgagePage() {
   const [propertyValue, setPropertyValue] = useState(50_000_000);
   const [downPercent, setDownPercent] = useState(30);
   const [termYears, setTermYears] = useState(15);
+  const { showToast } = useToast();
 
   const config = MORTGAGE_CONFIG[programType];
   const isRefinance = programType === "refinance";
@@ -470,12 +472,17 @@ export function MortgagePage() {
                   value={formatAmd(result.total)}
                 />
               </div>
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() =>
+                  showToast(
+                    "Заявка на ипотеку принята. Менеджер свяжется с вами в течение дня.",
+                  )
+                }
                 className="mt-6 block w-full rounded-lg bg-brand-green py-3 text-center font-semibold text-white transition-colors hover:bg-brand-green-light"
               >
                 Подать заявку
-              </a>
+              </button>
               <p className="mt-4 text-sm leading-6 text-gray-500">
                 Расчёт носит информационный характер. Точные условия зависят от
                 оценки недвижимости и решения банка.
