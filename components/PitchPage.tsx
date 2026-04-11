@@ -53,6 +53,29 @@ type Metric = {
   estimated: boolean;
 };
 
+type PrioritizedFeature = {
+  feature: string;
+  impact: number;
+  confidence: number;
+  effort: number;
+  rationale: string;
+};
+
+type AnalyticsEvent = {
+  event: string;
+  why: string;
+};
+
+type Guardrail = {
+  metric: string;
+  reason: string;
+};
+
+type LaunchRisk = {
+  item: string;
+  reason: string;
+};
+
 const PROBLEMS: Problem[] = [
   {
     icon: Calculator,
@@ -124,6 +147,13 @@ const SOLUTIONS = [
     solution: "Квиз из 3 вопросов → персональная рекомендация продукта",
     page: "/",
   },
+];
+
+const EXECUTIVE_SUMMARY = [
+  "Нашёл 6 точек потерь на текущем inecobank.am",
+  "Сформулировал 4 продуктовые гипотезы и метрики успеха",
+  "Собрал работающий прототип вместо презентации с рекомендациями",
+  "Следующий шаг: аналитика, compliance review и A/B-тесты",
 ];
 
 const METRICS: Metric[] = [
@@ -223,6 +253,104 @@ const HYPOTHESES: Hypothesis[] = [
   },
 ];
 
+const PRIORITIZED_FEATURES: PrioritizedFeature[] = [
+  {
+    feature: "Калькуляторы",
+    impact: 5,
+    confidence: 4,
+    effort: 2,
+    rationale:
+      "Ближе всего к заявке: пользователь сразу видит платёж, доход или первый взнос.",
+  },
+  {
+    feature: "Квиз подбора",
+    impact: 4,
+    confidence: 4,
+    effort: 2,
+    rationale:
+      "Снижает неопределённость для нового клиента и ведёт его на продуктовую страницу.",
+  },
+  {
+    feature: "FAQ и категории",
+    impact: 3,
+    confidence: 4,
+    effort: 1,
+    rationale:
+      "Быстрый способ уменьшить типовые вопросы и повысить доверие перед заявкой.",
+  },
+  {
+    feature: "Личный кабинет",
+    impact: 5,
+    confidence: 3,
+    effort: 5,
+    rationale:
+      "Сильная фича, но требует интеграций, безопасности и полноценного продуктового цикла.",
+  },
+];
+
+const ANALYTICS_EVENTS: AnalyticsEvent[] = [
+  {
+    event: "quiz_started",
+    why: "Понять, замечают ли пользователи подбор продукта на главной",
+  },
+  {
+    event: "quiz_completed",
+    why: "Измерить completion rate и качество перехода на продуктовую страницу",
+  },
+  {
+    event: "calculator_changed",
+    why: "Проверить, работает ли калькулятор как вовлекающий интерактив",
+  },
+  {
+    event: "cta_clicked",
+    why: "Отследить намерение оставить заявку по каждому продукту",
+  },
+  {
+    event: "application_started",
+    why: "Отделить интерес к продукту от реального начала заявки",
+  },
+];
+
+const GUARDRAILS: Guardrail[] = [
+  {
+    metric: "Рост звонков в поддержку",
+    reason: "Если звонков больше, интерфейс не объясняет условия достаточно ясно",
+  },
+  {
+    metric: "Ошибки формы",
+    reason: "Нельзя повышать CTA-click, если дальше пользователь упирается в ошибки",
+  },
+  {
+    metric: "Mobile drop-off",
+    reason: "Основная аудитория приходит с телефона, мобильная воронка критична",
+  },
+];
+
+const LAUNCH_RISKS: LaunchRisk[] = [
+  {
+    item: "Онлайн-заявка на кредит",
+    reason:
+      "Нельзя запускать без проверки ставок, скоринга, юридического текста и передачи заявки в CRM.",
+  },
+  {
+    item: "Калькуляторы как финальные условия",
+    reason:
+      "Расчёт должен быть помечен как предварительный до согласования с продуктом и compliance.",
+  },
+  {
+    item: "Личный кабинет",
+    reason:
+      "Фича требует отдельного security review, авторизации и интеграции с банковскими системами.",
+  },
+];
+
+const BUSINESS_SCENARIO = [
+  { label: "Трафик", value: "100k визитов/мес" },
+  { label: "Текущая CVR", value: "0.8% → 800 заявок" },
+  { label: "Целевая CVR", value: "2.0% → 2 000 заявок" },
+  { label: "Потенциал", value: "+1 200 заявок/мес до фильтра качества" },
+];
+
 const ROADMAP = [
   {
     quarter: "Q2 2026",
@@ -251,7 +379,7 @@ const ROADMAP = [
 ];
 
 const STACK = [
-  "Next.js 14 (App Router)",
+  "Next.js 16 (App Router)",
   "TypeScript",
   "Tailwind CSS v4",
   "Framer Motion",
@@ -313,6 +441,29 @@ export function PitchPage() {
         </Container>
       </section>
 
+      <section className="bg-[#F5F5F5] py-12">
+        <Container>
+          <motion.div
+            {...sectionAnimation}
+            className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+          >
+            <p className="text-sm font-semibold tracking-widest text-brand-green uppercase">
+              Executive summary
+            </p>
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {EXECUTIVE_SUMMARY.map((item, index) => (
+                <div key={item} className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-green/10 text-xs font-bold text-brand-green">
+                    {index + 1}
+                  </span>
+                  <p className="text-sm leading-6 text-gray-700">{item}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </Container>
+      </section>
+
       <section className="bg-[#F5F5F5] py-16">
         <Container>
           <motion.div {...sectionAnimation}>
@@ -342,6 +493,64 @@ export function PitchPage() {
                 </motion.div>
               );
             })}
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-16">
+        <Container>
+          <motion.div {...sectionAnimation}>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Приоритизация
+            </h2>
+            <p className="mt-2 text-gray-500">
+              Что запускать первым, если цель — быстро проверить влияние на
+              заявки
+            </p>
+          </motion.div>
+          <div className="mt-8 overflow-hidden rounded-2xl border border-gray-100 shadow-sm">
+            <table className="w-full min-w-[44rem] text-sm">
+              <thead className="bg-[#F5F5F5]">
+                <tr>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-700">
+                    Фича
+                  </th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-700">
+                    Impact
+                  </th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-700">
+                    Confidence
+                  </th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-700">
+                    Effort
+                  </th>
+                  <th className="px-5 py-3 text-left font-semibold text-gray-700">
+                    Почему
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {PRIORITIZED_FEATURES.map((item) => (
+                  <tr key={item.feature}>
+                    <td className="px-5 py-4 font-semibold text-gray-900">
+                      {item.feature}
+                    </td>
+                    <td className="px-5 py-4 text-brand-green">
+                      {item.impact}/5
+                    </td>
+                    <td className="px-5 py-4 text-brand-green">
+                      {item.confidence}/5
+                    </td>
+                    <td className="px-5 py-4 text-gray-600">
+                      {item.effort}/5
+                    </td>
+                    <td className="px-5 py-4 text-gray-600">
+                      {item.rationale}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </Container>
       </section>
@@ -477,6 +686,110 @@ export function PitchPage() {
               </motion.div>
             ))}
           </div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-16">
+        <Container>
+          <motion.div {...sectionAnimation}>
+            <h2 className="text-2xl font-bold text-gray-900">
+              План валидации
+            </h2>
+            <p className="mt-2 text-gray-500">
+              Какие события я бы завёл перед A/B-тестом
+            </p>
+          </motion.div>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {ANALYTICS_EVENTS.map((item) => (
+              <motion.div
+                key={item.event}
+                {...sectionAnimation}
+                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+              >
+                <p className="font-mono text-sm font-semibold text-brand-green">
+                  {item.event}
+                </p>
+                <p className="mt-2 text-sm text-gray-600">{item.why}</p>
+              </motion.div>
+            ))}
+          </div>
+          <div className="mt-8 rounded-2xl border border-gray-100 bg-[#F5F5F5] p-6">
+            <h3 className="font-bold text-gray-900">Guardrail metrics</h3>
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {GUARDRAILS.map((item) => (
+                <div key={item.metric}>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {item.metric}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-gray-500">
+                    {item.reason}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-[#F5F5F5] py-16">
+        <Container>
+          <motion.div {...sectionAnimation}>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Что не запускать сразу
+            </h2>
+            <p className="mt-2 text-gray-500">
+              Ограничения, которые я бы зафиксировал до полноценного релиза
+            </p>
+          </motion.div>
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+            {LAUNCH_RISKS.map((item) => (
+              <motion.div
+                key={item.item}
+                {...sectionAnimation}
+                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+              >
+                <p className="text-sm font-bold text-gray-900">{item.item}</p>
+                <p className="mt-2 text-sm leading-6 text-gray-500">
+                  {item.reason}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="bg-white py-16">
+        <Container>
+          <motion.div {...sectionAnimation}>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Сценарий бизнес-эффекта
+            </h2>
+            <p className="mt-2 text-gray-500">
+              Не прогноз, а пример модели, которую я бы проверил на реальных
+              данных
+            </p>
+          </motion.div>
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
+            {BUSINESS_SCENARIO.map((item) => (
+              <motion.div
+                key={item.label}
+                {...sectionAnimation}
+                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+              >
+                <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                  {item.label}
+                </p>
+                <p className="mt-2 text-lg font-extrabold text-gray-900">
+                  {item.value}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-gray-400">
+            * Сценарий нужен для разговора о порядке эффекта. В реальном проекте
+            модель пересчитывается после подключения GA4, CRM и данных по
+            качеству заявок.
+          </p>
         </Container>
       </section>
 
