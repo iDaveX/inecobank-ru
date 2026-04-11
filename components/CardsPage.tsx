@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, X as XIcon } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useToast } from "@/components/Toast";
 
 type CardType = "visa" | "mastercard" | "arca";
 type FilterType = "all" | CardType;
@@ -179,9 +180,11 @@ function MiniCard({
 function ProductCard({
   card,
   onAddToCompare,
+  onApply,
 }: {
   card: BankCard;
   onAddToCompare: (id: string) => void;
+  onApply: (card: BankCard) => void;
 }) {
   return (
     <motion.div
@@ -229,12 +232,13 @@ function ProductCard({
           ))}
         </div>
 
-        <a
-          href="#"
+        <button
+          type="button"
+          onClick={() => onApply(card)}
           className="mt-5 block w-full rounded-lg bg-brand-green py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
         >
           Оформить карту
-        </a>
+        </button>
         <button
           type="button"
           onClick={() => onAddToCompare(card.id)}
@@ -271,7 +275,7 @@ function InfoRow({
 export function CardsPage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [compareList, setCompareList] = useState<string[]>([]);
-  const [compareMessage, setCompareMessage] = useState("");
+  const { showToast } = useToast();
 
   const filteredCards = useMemo(
     () =>
@@ -287,23 +291,29 @@ export function CardsPage() {
   );
 
   const addToCompare = (id: string) => {
-    setCompareMessage("");
-
     if (compareList.includes(id)) {
       return;
     }
 
+    const card = CARDS.find((item) => item.id === id);
+
     if (compareList.length >= 3) {
-      setCompareMessage("Можно сравнивать до 3 карт");
+      showToast("Можно сравнивать до 3 карт", "info");
       return;
     }
 
     setCompareList((current) => [...current, id]);
+    if (card) {
+      showToast(`«${card.name}» добавлена в сравнение`);
+    }
   };
 
   const removeFromCompare = (id: string) => {
-    setCompareMessage("");
     setCompareList((current) => current.filter((cardId) => cardId !== id));
+  };
+
+  const showCardRequestToast = (card: BankCard) => {
+    showToast(`Заявка на карту «${card.name}» принята. Менеджер свяжется с вами.`);
   };
 
   return (
@@ -319,12 +329,17 @@ export function CardsPage() {
                 Visa, Mastercard и ArCa — для покупок в Армении и по всему миру
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a
-                  href="#"
+                <button
+                  type="button"
+                  onClick={() =>
+                    showToast(
+                      "Заявка принята. Менеджер свяжется с вами в течение дня.",
+                    )
+                  }
                   className="rounded-lg bg-brand-green px-6 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
                 >
                   Открыть карту онлайн
-                </a>
+                </button>
                 <a
                   href="#compare"
                   className="rounded-lg border border-brand-green px-6 py-3 text-center text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green hover:text-white"
@@ -391,6 +406,7 @@ export function CardsPage() {
                   key={card.id}
                   card={card}
                   onAddToCompare={addToCompare}
+                  onApply={showCardRequestToast}
                 />
               ))}
             </AnimatePresence>
@@ -401,11 +417,6 @@ export function CardsPage() {
       <motion.section id="compare" className="bg-white py-16" {...sectionMotion}>
         <Container>
           <h2 className="text-3xl font-bold text-gray-950">Сравнение карт</h2>
-          {compareMessage ? (
-            <p className="mt-3 text-sm font-semibold text-brand-green">
-              {compareMessage}
-            </p>
-          ) : null}
 
           {selectedCards.length === 0 ? (
             <div className="mt-8 rounded-xl bg-gray-50 px-6 py-14 text-center">
@@ -494,12 +505,13 @@ export function CardsPage() {
                       </td>
                       {selectedCards.map((card) => (
                         <td key={card.id} className="px-6 py-4">
-                          <a
-                            href="#"
+                          <button
+                            type="button"
+                            onClick={() => showCardRequestToast(card)}
                             className="inline-flex rounded-lg bg-brand-green px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
                           >
                             Оформить
-                          </a>
+                          </button>
                         </td>
                       ))}
                     </tr>
@@ -510,7 +522,6 @@ export function CardsPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setCompareMessage("");
                   setCompareList([]);
                 }}
                 className="mt-5 rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-500"

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Car, Check, RefreshCw, Wallet, Zap } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
+import { useToast } from "@/components/Toast";
 
 type LoanType = "consumer" | "express" | "auto" | "refinance";
 type IconComponent = ComponentType<{ className?: string }>;
@@ -202,6 +203,7 @@ export function LoansPage() {
   const [loanType, setLoanType] = useState<LoanType>("consumer");
   const [amount, setAmount] = useState(5_000_000);
   const [term, setTerm] = useState(36);
+  const { showToast } = useToast();
 
   const config = LOAN_CONFIG[loanType];
   const activeProduct = LOAN_PRODUCTS.find((product) => product.id === loanType)!;
@@ -404,12 +406,17 @@ export function LoansPage() {
                   value={formatAmd(result.total)}
                 />
               </div>
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() =>
+                  showToast(
+                    "Заявка принята. Менеджер свяжется с вами в течение дня.",
+                  )
+                }
                 className="mt-6 block w-full rounded-lg bg-brand-green py-3 text-center font-semibold text-white transition-colors hover:bg-brand-green-light"
               >
                 Оформить кредит
-              </a>
+              </button>
               <p className="mt-4 text-sm leading-6 text-gray-500">
                 Расчёт носит информационный характер. Точные условия — после
                 рассмотрения заявки.

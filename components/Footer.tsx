@@ -1,7 +1,21 @@
-import { Logo } from "./Logo";
+"use client";
 
-const productLinks = ["Карты", "Кредиты", "Депозиты", "Ипотека", "Переводы"];
-const companyLinks = ["О банке", "Карьера", "Пресс-центр", "Контакты"];
+import { Logo } from "./Logo";
+import { useToast } from "@/components/Toast";
+
+const productLinks = [
+  { label: "Карты", href: "/cards" },
+  { label: "Кредиты", href: "/loans" },
+  { label: "Депозиты", href: "/deposits" },
+  { label: "Ипотека", href: "/mortgage" },
+  { label: "Переводы", href: "/transfers" },
+];
+const companyLinks = [
+  { label: "О банке", href: "/about" },
+  { label: "Карьера" },
+  { label: "Пресс-центр" },
+  { label: "Контакты" },
+];
 const supportLinks = [
   { label: "FAQ", href: "/faq" },
   { label: "Отделения и банкоматы", href: "/branches" },
@@ -57,11 +71,25 @@ const socialLinks = [
 
 function FooterLink({
   children,
-  href = "#",
+  href,
+  onClick,
 }: {
   children: React.ReactNode;
   href?: string;
+  onClick?: () => void;
 }) {
+  if (!href) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="text-left text-sm text-gray-400 transition-colors hover:text-white"
+      >
+        {children}
+      </button>
+    );
+  }
+
   return (
     <a
       href={href}
@@ -73,6 +101,8 @@ function FooterLink({
 }
 
 export function Footer() {
+  const { showToast } = useToast();
+
   return (
     <footer className="bg-brand-dark text-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -82,14 +112,20 @@ export function Footer() {
             <p className="mt-4 text-sm text-gray-400">Банк для жизни</p>
             <div className="mt-6 flex items-center gap-1">
               {socialLinks.map((social) => (
-                <a
+                <button
                   key={social.label}
-                  href={social.href}
+                  type="button"
+                  onClick={() =>
+                    showToast(
+                      "Социальные сети доступны на официальном сайте inecobank.am",
+                      "info",
+                    )
+                  }
                   className="flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
                   aria-label={social.label}
                 >
                   {social.icon}
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -100,7 +136,9 @@ export function Footer() {
             </h3>
             <div className="mt-4 flex flex-col gap-3">
               {productLinks.map((link) => (
-                <FooterLink key={link}>{link}</FooterLink>
+                <FooterLink key={link.label} href={link.href}>
+                  {link.label}
+                </FooterLink>
               ))}
             </div>
           </div>
@@ -111,7 +149,18 @@ export function Footer() {
             </h3>
             <div className="mt-4 flex flex-col gap-3">
               {companyLinks.map((link) => (
-                <FooterLink key={link}>{link}</FooterLink>
+                <FooterLink
+                  key={link.label}
+                  href={link.href}
+                  onClick={() =>
+                    showToast(
+                      "Раздел доступен на официальном сайте inecobank.am",
+                      "info",
+                    )
+                  }
+                >
+                  {link.label}
+                </FooterLink>
               ))}
             </div>
           </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { SiteChrome } from "@/components/SiteChrome";
+import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,7 +25,9 @@ export default function RootLayout({
       className={`${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full font-sans">
-        <SiteChrome>{children}</SiteChrome>
+        <ToastProvider>
+          <SiteChrome>{children}</SiteChrome>
+        </ToastProvider>
       </body>
     </html>
   );

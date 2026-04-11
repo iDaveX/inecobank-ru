@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Shield, Smartphone, TrendingUp, Users } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
+import { useToast } from "@/components/Toast";
 
 type Stat = {
   value: string;
@@ -100,6 +101,8 @@ function Container({ children }: { children: ReactNode }) {
 }
 
 export function AboutPage() {
+  const { showToast } = useToast();
+
   return (
     <>
       <section className="bg-white pt-28 pb-16">
@@ -225,12 +228,17 @@ export function AboutPage() {
             <p className="mt-4 text-white/90">
               Откройте счёт онлайн за 5 минут
             </p>
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={() =>
+                showToast(
+                  "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
+                )
+              }
               className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-sm font-semibold text-brand-green transition-colors hover:bg-gray-100"
             >
               Открыть счёт
-            </a>
+            </button>
           </motion.div>
         </div>
       </section>

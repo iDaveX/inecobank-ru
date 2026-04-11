@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Banknote, Clock, Globe, Smartphone, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
+import { useToast } from "@/components/Toast";
 
 type TransferTab = "internal" | "domestic" | "international";
 
@@ -222,6 +223,7 @@ function InternationalTransfers() {
 
 export function TransfersPage() {
   const [activeTab, setActiveTab] = useState<TransferTab>("internal");
+  const { showToast } = useToast();
 
   useEffect(() => {
     const applyHash = () => {
@@ -315,12 +317,17 @@ export function TransfersPage() {
             <p className="mt-4 text-white/90">
               Откройте счёт и получите 3 месяца бесплатных переводов
             </p>
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={() =>
+                showToast(
+                  "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
+                )
+              }
               className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-sm font-semibold text-brand-green transition-colors hover:bg-gray-100"
             >
               Открыть счёт
-            </a>
+            </button>
           </motion.div>
         </div>
       </section>

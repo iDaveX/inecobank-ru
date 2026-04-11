@@ -4,23 +4,26 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useToast } from "./Toast";
 import { Logo } from "./Logo";
+
+const WIP_MESSAGE = "Раздел в разработке";
 
 const navigation = [
   {
     label: "Счета",
     items: [
-      { label: "Текущий счёт", href: "#" },
-      { label: "Сберегательный счёт", href: "#" },
+      { label: "Текущий счёт", href: "#", stub: true },
+      { label: "Сберегательный счёт", href: "#", stub: true },
     ],
   },
   {
     label: "Карты",
     items: [
       { label: "Все карты", href: "/cards" },
-      { label: "Visa", href: "#" },
-      { label: "Mastercard", href: "#" },
-      { label: "ArCa", href: "#" },
+      { label: "Visa", href: "#", stub: true },
+      { label: "Mastercard", href: "#", stub: true },
+      { label: "ArCa", href: "#", stub: true },
     ],
   },
   {
@@ -28,15 +31,15 @@ const navigation = [
     items: [
       { label: "Потребительский", href: "/loans" },
       { label: "Ипотека", href: "/mortgage" },
-      { label: "Автокредит", href: "#" },
+      { label: "Автокредит", href: "#", stub: true },
     ],
   },
   {
     label: "Депозиты",
     items: [
       { label: "Срочный", href: "/deposits" },
-      { label: "Гибкий", href: "#" },
-      { label: "INECOSAVE", href: "#" },
+      { label: "Гибкий", href: "#", stub: true },
+      { label: "INECOSAVE", href: "#", stub: true },
     ],
   },
   {
@@ -73,6 +76,7 @@ const drawerVariants: Variants = {
 };
 
 export function Header() {
+  const { showToast } = useToast();
   const [hasShadow, setHasShadow] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeDesktopMenu, setActiveDesktopMenu] = useState<string | null>(
@@ -208,16 +212,27 @@ export function Header() {
                 aria-label={section.label}
               >
                 <div className="rounded-lg bg-white p-2 shadow-xl ring-1 ring-black/5">
-                  {section.items.map((item) => (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
-                      role="menuitem"
-                    >
-                      {item.label}
-                    </a>
-                  ))}
+                  {section.items.map((item) =>
+                    item.stub ? (
+                      <button
+                        key={item.label}
+                        type="button"
+                        onClick={() => showToast(WIP_MESSAGE, "info")}
+                        className="block w-full rounded-md px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <a
+                        key={item.label}
+                        href={item.href}
+                        className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
+                        role="menuitem"
+                      >
+                        {item.label}
+                      </a>
+                    ),
+                  )}
                 </div>
               </motion.div>
             </div>
@@ -231,18 +246,24 @@ export function Header() {
           >
             PM-кейс
           </Link>
-          <a
-            href="#"
+          <button
+            type="button"
+            onClick={() => showToast(WIP_MESSAGE, "info")}
             className="rounded-md border border-brand-green px-4 py-2 text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green hover:text-white"
           >
             Войти
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              showToast(
+                "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
+              )
+            }
             className="rounded-md bg-brand-green px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
           >
             Открыть счёт
-          </a>
+          </button>
           <span
             className="text-sm font-medium text-gray-500"
             aria-label="Язык: русский"
@@ -340,16 +361,30 @@ export function Header() {
                             className="overflow-hidden"
                           >
                             <div className="space-y-1 pb-2 pl-4">
-                              {section.items.map((item) => (
-                                <a
-                                  key={item.label}
-                                  href={item.href}
-                                  className="block rounded-md px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
-                                  onClick={() => setIsDrawerOpen(false)}
-                                >
-                                  {item.label}
-                                </a>
-                              ))}
+                              {section.items.map((item) =>
+                                item.stub ? (
+                                  <button
+                                    key={item.label}
+                                    type="button"
+                                    onClick={() => {
+                                      showToast(WIP_MESSAGE, "info");
+                                      setIsDrawerOpen(false);
+                                    }}
+                                    className="block w-full rounded-md px-3 py-2 text-left text-sm text-gray-600 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
+                                  >
+                                    {item.label}
+                                  </button>
+                                ) : (
+                                  <a
+                                    key={item.label}
+                                    href={item.href}
+                                    className="block rounded-md px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
+                                    onClick={() => setIsDrawerOpen(false)}
+                                  >
+                                    {item.label}
+                                  </a>
+                                ),
+                              )}
                             </div>
                           </motion.div>
                         ) : null}
@@ -360,18 +395,25 @@ export function Header() {
               </div>
 
               <div className="space-y-3 border-t border-gray-100 p-4">
-                <a
-                  href="#"
-                  className="block rounded-md border border-brand-green px-4 py-3 text-center text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green hover:text-white"
+                <button
+                  type="button"
+                  onClick={() => showToast(WIP_MESSAGE, "info")}
+                  className="block w-full rounded-md border border-brand-green px-4 py-3 text-center text-sm font-semibold text-brand-green transition-colors hover:bg-brand-green hover:text-white"
                 >
                   Войти
-                </a>
-                <a
-                  href="#"
-                  className="block rounded-md bg-brand-green px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    showToast(
+                      "Заявка на открытие счёта принята. Менеджер свяжется с вами.",
+                    );
+                    setIsDrawerOpen(false);
+                  }}
+                  className="block w-full rounded-md bg-brand-green px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-green-light"
                 >
                   Открыть счёт
-                </a>
+                </button>
               </div>
             </motion.aside>
           </>

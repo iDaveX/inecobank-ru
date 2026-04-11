@@ -21,11 +21,12 @@
 - FAQ с категориями и аккордеоном
 - Поиск и фильтры отделений
 - О банке, 404
+- Toast-уведомления на все CTA-кнопки
 - PM-питч с воронкой, метриками и продуктовыми гипотезами
 
 ## Стек
 
-- Next.js 14 (App Router)
+- Next.js 16 (App Router)
 - TypeScript
 - Tailwind CSS v4
 - Framer Motion
