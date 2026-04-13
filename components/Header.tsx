@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToast } from "./Toast";
 import { Logo } from "./Logo";
 
@@ -82,6 +82,7 @@ export function Header() {
   const [activeDesktopMenu, setActiveDesktopMenu] = useState<string | null>(
     null,
   );
+  const navRef = useRef<HTMLElement>(null);
   const [openMobileSection, setOpenMobileSection] = useState<string | null>(
     null,
   );
@@ -103,6 +104,30 @@ export function Header() {
     };
   }, [isDrawerOpen]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActiveDesktopMenu(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setActiveDesktopMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <header
       className={`fixed left-0 top-0 z-50 w-full bg-white transition-shadow ${
@@ -114,7 +139,7 @@ export function Header() {
           <Logo />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav ref={navRef} className="hidden items-center gap-1 lg:flex">
           {navigation.map((section) => (
             <div
               key={section.label}
@@ -149,13 +174,14 @@ export function Header() {
                         {item.label}
                       </button>
                     ) : (
-                      <a
+                      <Link
                         key={item.label}
                         href={item.href}
+                        onClick={() => setActiveDesktopMenu(null)}
                         className="block rounded-md px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-brand-green/10 hover:text-brand-green"
                       >
                         {item.label}
-                      </a>
+                      </Link>
                     ),
                   )}
                 </div>

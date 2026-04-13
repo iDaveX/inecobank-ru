@@ -88,8 +88,15 @@ const regulatoryItems = [
 const sectionAnimation = {
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
+  viewport: { once: true, amount: 0 },
   transition: { duration: 0.45 },
+};
+
+const timelineAnimation = {
+  initial: { opacity: 0, x: -10 },
+  whileInView: { opacity: 1, x: 0 },
+  viewport: { once: true, amount: 0 },
+  transition: { duration: 0.35 },
 };
 
 function Container({ children }: { children: ReactNode }) {
@@ -160,7 +167,7 @@ export function AboutPage() {
             {TIMELINE.map((item) => (
               <motion.div
                 key={item.year}
-                {...sectionAnimation}
+                {...timelineAnimation}
                 className="relative"
               >
                 <span className="absolute top-1 -left-[2.6rem] h-4 w-4 rounded-full border-2 border-brand-green bg-white" />

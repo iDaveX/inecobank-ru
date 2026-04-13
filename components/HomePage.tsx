@@ -2,15 +2,21 @@
 
 import {
   ArrowLeftRight,
+  Award,
   Banknote,
+  Building2,
   ChevronLeft,
   CheckCircle,
+  Clock,
   CreditCard,
   Home as HomeIcon,
+  MapPin,
   PiggyBank,
   Receipt,
   Star,
+  TrendingDown,
   TrendingUp,
+  Users,
   Wallet,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,29 +27,41 @@ import { useToast } from "@/components/Toast";
 type IconComponent = ComponentType<{ className?: string }>;
 type QuizStep =
   | "goal"
-  | "term"
-  | "amount"
-  | "card_usage"
+  | "save_term"
+  | "save_amount"
+  | "borrow_purpose"
+  | "borrow_amount"
+  | "card_geography"
   | "card_priority"
   | "card_spending"
+  | "send_destination"
+  | "send_amount"
   | "result";
 type Goal = "save" | "borrow" | "spend" | "send";
-type Term = "short" | "medium" | "long";
-type Amount = "small" | "medium" | "large";
-type CardUsage = "local" | "international" | "both";
+type SaveTerm = "short" | "medium" | "long";
+type SaveAmount = "small" | "medium" | "large";
+type BorrowPurpose = "home" | "car" | "personal";
+type BorrowAmount = "small" | "medium" | "large";
+type CardGeography = "local" | "international" | "both";
 type CardPriority = "cashback" | "travel" | "simplicity";
 type CardSpending = "low" | "medium" | "high";
+type SendDestination = "domestic" | "abroad" | "online";
+type SendAmount = "small" | "medium" | "large";
 
 interface QuizState {
   goal: Goal | null;
-  term: Term | null;
-  amount: Amount | null;
-  cardUsage: CardUsage | null;
+  saveTerm: SaveTerm | null;
+  saveAmount: SaveAmount | null;
+  borrowPurpose: BorrowPurpose | null;
+  borrowAmount: BorrowAmount | null;
+  cardGeography: CardGeography | null;
   cardPriority: CardPriority | null;
   cardSpending: CardSpending | null;
+  sendDestination: SendDestination | null;
+  sendAmount: SendAmount | null;
 }
 
-type Recommendation = { title: string; text: string; href: string; cta: string };
+type Recommendation = { title: string; description: string; href: string; cta: string };
 type AppItem = { key: string; name: string; detail: string; icon: IconComponent; amount: string; btnLabel: string };
 type AppTab = { label: string; items: AppItem[] };
 
@@ -95,27 +113,39 @@ const products: { title: string; text: string; cta: string; url: string; icon: I
 
 const GOALS = [
   { id: "save", label: "Накопить", icon: PiggyBank },
-  { id: "borrow", label: "Получить кредит", icon: Wallet },
-  { id: "spend", label: "Платить картой", icon: CreditCard },
-  { id: "send", label: "Переводить деньги", icon: ArrowLeftRight },
+  { id: "borrow", label: "Взять кредит", icon: Wallet },
+  { id: "spend", label: "Получить карту", icon: CreditCard },
+  { id: "send", label: "Перевести деньги", icon: ArrowLeftRight },
 ] as const;
 
-const TERMS = [
-  { id: "short", label: "До 6 месяцев" },
-  { id: "medium", label: "От 6 до 24 месяцев" },
-  { id: "long", label: "Более 2 лет" },
+const SAVE_TERMS = [
+  { id: "short", label: "До 3 месяцев" },
+  { id: "medium", label: "3–12 месяцев" },
+  { id: "long", label: "Больше года" },
 ] as const;
 
-const AMOUNTS = [
-  { id: "small", label: "До 500 000 AMD" },
-  { id: "medium", label: "500 000 — 5 000 000 AMD" },
-  { id: "large", label: "Более 5 000 000 AMD" },
+const SAVE_AMOUNTS = [
+  { id: "small", label: "До 500 000 ֏" },
+  { id: "medium", label: "500 000 – 3 000 000 ֏" },
+  { id: "large", label: "Больше 3 000 000 ֏" },
 ] as const;
 
-const CARD_USAGES = [
+const BORROW_PURPOSES = [
+  { id: "home", label: "Купить жильё" },
+  { id: "car", label: "Купить автомобиль" },
+  { id: "personal", label: "Личные нужды / ремонт" },
+] as const;
+
+const BORROW_AMOUNTS = [
+  { id: "small", label: "До 1 000 000 ֏" },
+  { id: "medium", label: "1–10 млн ֏" },
+  { id: "large", label: "Больше 10 млн ֏" },
+] as const;
+
+const CARD_GEOGRAPHIES = [
   { id: "local", label: "Только в Армении", sub: "Покупки, банкоматы, переводы внутри страны" },
-  { id: "international", label: "За рубежом", sub: "Путешествия, зарубежные покупки, онлайн в валюте" },
-  { id: "both", label: "И там, и там", sub: "Регулярно использую и дома, и за границей" },
+  { id: "international", label: "За рубежом / в онлайн-магазинах", sub: "Путешествия, зарубежные покупки, онлайн в валюте" },
+  { id: "both", label: "Везде", sub: "Регулярно использую и дома, и за границей" },
 ] as const;
 
 const CARD_PRIORITIES = [
@@ -125,9 +155,21 @@ const CARD_PRIORITIES = [
 ] as const;
 
 const CARD_SPENDINGS = [
-  { id: "low", label: "До 100 000 AMD / месяц", sub: "Базовые расходы, продукты, транспорт" },
-  { id: "medium", label: "100 000 — 500 000 AMD", sub: "Активные расходы, кафе, онлайн-покупки" },
-  { id: "high", label: "Более 500 000 AMD", sub: "Высокий оборот, бизнес-траты или частые поездки" },
+  { id: "low", label: "До 50 000 ֏", sub: "Базовые расходы, продукты, транспорт" },
+  { id: "medium", label: "50 000 – 200 000 ֏", sub: "Активные расходы, кафе, онлайн-покупки" },
+  { id: "high", label: "Больше 200 000 ֏", sub: "Высокий оборот, бизнес-траты или частые поездки" },
+] as const;
+
+const SEND_DESTINATIONS = [
+  { id: "domestic", label: "Внутри Армении" },
+  { id: "abroad", label: "За рубеж" },
+  { id: "online", label: "Онлайн-перевод в валюте" },
+] as const;
+
+const SEND_AMOUNTS = [
+  { id: "small", label: "До 100 000 ֏" },
+  { id: "medium", label: "100 000 – 1 000 000 ֏" },
+  { id: "large", label: "Больше 1 000 000 ֏" },
 ] as const;
 
 const exchangeRates = [
@@ -138,14 +180,14 @@ const exchangeRates = [
 ];
 
 const paymentServices = [
-  { text: "ВЭБ", color: "#FF6B35" },
-  { text: "Газ", color: "#0055A5" },
-  { text: "Свет", color: "#00A651" },
-  { text: "Водоканал", color: "#8B5CF6" },
-  { text: "Beeline", color: "#EF4444" },
-  { text: "Ucom", color: "#F97316" },
-  { text: "VivaCell", color: "#3B82F6" },
-  { text: "Интернет", color: "#6B7280" },
+  { text: "ВЭБ", name: "Коммунальные", color: "#FF6B35" },
+  { text: "Газ", name: "Газоснабжение", color: "#0055A5" },
+  { text: "Свет", name: "Электричество", color: "#00A651" },
+  { text: "Вода", name: "Водоканал", color: "#8B5CF6" },
+  { text: "Bee", name: "Beeline", color: "#EF4444" },
+  { text: "Ucom", name: "Ucom", color: "#F97316" },
+  { text: "Viva", name: "VivaCell", color: "#3B82F6" },
+  { text: "Net", name: "Интернет", color: "#6B7280" },
 ];
 
 const news = [
@@ -228,6 +270,16 @@ const appTabs: AppTab[] = [
 
 function tagColorClass(tag: string): string {
   return TAG_COLORS[tag] ?? "bg-gray-100 text-gray-600";
+}
+
+function tagBorderClass(tag: string): string {
+  const colors: Record<string, string> = {
+    "Продукты": "border-emerald-500",
+    "Партнёрство": "border-blue-500",
+    "Технологии": "border-purple-500",
+  };
+
+  return colors[tag] ?? "border-gray-200";
 }
 
 function Section({
@@ -585,7 +637,7 @@ function TestimonialsSection() {
             Нам доверяют 500 000+ человек
           </h2>
         </motion.div>
-        <div className="mt-10 grid gap-5 sm:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((t, i) => (
             <motion.div
               key={t.name}
@@ -593,16 +645,37 @@ function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45, delay: i * 0.1 }}
-              className="flex flex-col rounded-2xl bg-white p-6 shadow-sm"
+              className={`relative flex flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-sm ${
+                i === 0 ? "sm:col-span-2" : ""
+              }`}
             >
+              {i === 0 ? (
+                <span className="pointer-events-none absolute -top-6 right-6 text-[96px] leading-none font-black text-brand-green/10">
+                  &quot;
+                </span>
+              ) : null}
               <div className="mb-4 flex items-center gap-1">
                 {[...Array(t.stars)].map((_, s) => (
                   <Star key={s} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="flex-1 text-sm leading-7 text-gray-600">«{t.quote}»</p>
+              <p
+                className={`relative flex-1 leading-7 text-gray-600 ${
+                  i === 0 ? "text-lg" : "text-sm"
+                }`}
+              >
+                «{t.quote}»
+              </p>
               <div className="mt-5 flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-green/10 text-xs font-bold text-brand-green">
+                <div
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${
+                    i === 0
+                      ? "bg-gradient-to-br from-brand-green to-emerald-400"
+                      : i === 1
+                      ? "bg-gradient-to-br from-teal-600 to-brand-green-light"
+                      : "bg-gradient-to-br from-lime-600 to-brand-green"
+                  }`}
+                >
                   {t.initials}
                 </div>
                 <div>
@@ -621,76 +694,213 @@ function TestimonialsSection() {
 // ── Quiz logic ─────────────────────────────────────────────────────────────────
 function getRecommendation(state: QuizState): Recommendation {
   if (state.goal === "save") {
-    return state.term === "long"
-      ? { title: "Срочный депозит", text: "Высокая ставка до 10% годовых. Ежемесячная выплата процентов.", href: "/deposits", cta: "Открыть депозит" }
-      : { title: "Сберегательный счёт", text: "Гибкий доступ к деньгам без ограничений по снятию.", href: "#", cta: "Открыть счёт" };
+    if (state.saveTerm === "long") {
+      return { title: "Срочный депозит", description: "Высокий процент и фиксированный срок для денег, которые не нужны каждый день.", href: "/deposits", cta: "Открыть депозит" };
+    }
+
+    if (state.saveTerm === "medium" || state.saveAmount !== "small") {
+      return { title: "Накопительный депозит", description: "Можно пополнять и планомерно увеличивать сумму без лишней сложности.", href: "/deposits", cta: "Подобрать депозит" };
+    }
+
+    return { title: "Сберегательный счёт", description: "Без срока и со свободным доступом к деньгам для короткой финансовой подушки.", href: "#", cta: "Открыть счёт" };
   }
 
   if (state.goal === "borrow") {
-    return state.amount === "large"
-      ? { title: "Ипотека", text: "Государственные программы от 8.5% годовых. До 30 лет.", href: "/mortgage", cta: "Рассчитать ипотеку" }
-      : { title: "Потребительский кредит", text: "До 10 000 000 AMD без залога. Решение за 1 минуту.", href: "/loans", cta: "Рассчитать кредит" };
+    if (state.borrowPurpose === "home") {
+      return { title: "Ипотека", description: "Для покупки жилья: длинный срок, крупная сумма и льготные программы.", href: "/mortgage", cta: "Рассчитать ипотеку" };
+    }
+
+    if (state.borrowPurpose === "car") {
+      return { title: "Автокредит", description: "Финансирование покупки автомобиля с понятным графиком платежей.", href: "/loans", cta: "Посмотреть автокредит" };
+    }
+
+    if (state.borrowAmount === "large") {
+      return { title: "Потребительский кредит", description: "Для крупных личных расходов и ремонта с индивидуальными условиями.", href: "/loans", cta: "Рассчитать кредит" };
+    }
+
+    return { title: "Экспресс-кредит", description: "Быстрое решение для небольших и средних сумм без лишних документов.", href: "/loans", cta: "Оформить онлайн" };
   }
 
   if (state.goal === "spend") {
-    const { cardUsage, cardPriority, cardSpending } = state;
+    const { cardGeography, cardPriority, cardSpending } = state;
 
-    if (cardUsage === "local") {
-      return { title: "Карта ArCa", text: "Национальная карта Армении. Бесплатное обслуживание, кешбэк в партнёрской сети.", href: "/cards", cta: "Оформить карту" };
+    if (cardGeography === "local") {
+      return { title: "Карта ArCa", description: "Локальная платёжная система для покупок и снятия наличных в Армении.", href: "/cards", cta: "Оформить карту" };
     }
 
-    if (cardSpending === "high" || cardPriority === "travel") {
-      return { title: "Visa Gold", text: "Повышенный кешбэк, страховка для путешественников, приоритетное обслуживание.", href: "/cards", cta: "Оформить карту" };
+    if (cardPriority === "travel") {
+      return { title: "Visa Gold", description: "Для поездок, зарубежных покупок и статуса выше базовой карты.", href: "/cards", cta: "Оформить карту" };
+    }
+
+    if (cardGeography === "international" && cardPriority === "cashback" && cardSpending === "high") {
+      return { title: "Visa Gold с кешбэком", description: "Для активных международных трат с повышенными бонусами.", href: "/cards", cta: "Оформить карту" };
     }
 
     if (cardPriority === "cashback") {
-      return { title: "Visa Classic с кешбэком", text: "До 3% на покупки в магазинах и онлайн. Бесплатное обслуживание первый год.", href: "/cards", cta: "Оформить карту" };
+      return { title: "Visa Classic с кешбэком", description: "Для повседневных покупок и онлайн-заказов с возвратом части расходов.", href: "/cards", cta: "Оформить карту" };
     }
 
-    return { title: "Mastercard Standard", text: "Удобная карта для повседневных покупок и зарубежных поездок. Без скрытых условий.", href: "/cards", cta: "Оформить карту" };
+    return { title: "Mastercard Standard", description: "Простая международная карта без лишних условий для регулярных платежей.", href: "/cards", cta: "Оформить карту" };
   }
 
-  return { title: "Переводы INECOBANK", text: "Внутри Армении и за рубеж. Низкие комиссии, быстрые сроки.", href: "/transfers", cta: "Узнать о переводах" };
+  if (state.goal === "send") {
+    if (state.sendDestination === "domestic") {
+      return { title: "Переводы INECOBANK", description: "Бесплатные и быстрые переводы внутри банка по Армении.", href: "/transfers", cta: "Открыть переводы" };
+    }
+
+    if (state.sendDestination === "abroad" && state.sendAmount === "large") {
+      return { title: "SWIFT-перевод", description: "Для крупных международных переводов через корреспондентскую сеть.", href: "/transfers#international", cta: "Посмотреть SWIFT" };
+    }
+
+    if (state.sendDestination === "abroad") {
+      return { title: "Western Union через INECOBANK", description: "Быстрый вариант для небольших и средних переводов за рубеж.", href: "/transfers#international", cta: "Посмотреть условия" };
+    }
+
+    return { title: "Конвертация и перевод через мобильное приложение", description: "Для онлайн-переводов в валюте без визита в отделение.", href: "/transfers#international", cta: "Открыть приложение" };
+  }
+
+  return { title: "Продукты INECOBANK", description: "Ответьте на вопросы, и мы подберём подходящий продукт.", href: "#quiz", cta: "Начать заново" };
 }
 
-function getStepIndex(step: QuizStep): number {
-  const map: Record<QuizStep, number> = {
-    goal: 0, term: 1, amount: 2,
-    card_usage: 1, card_priority: 2, card_spending: 3,
-    result: -1,
+function getNextStep(state: QuizState): QuizStep {
+  if (state.goal === "save") {
+    if (!state.saveTerm) return "save_term";
+    if (!state.saveAmount) return "save_amount";
+    return "result";
+  }
+
+  if (state.goal === "borrow") {
+    if (!state.borrowPurpose) return "borrow_purpose";
+    if (!state.borrowAmount) return "borrow_amount";
+    return "result";
+  }
+
+  if (state.goal === "spend") {
+    if (!state.cardGeography) return "card_geography";
+    if (!state.cardPriority) return "card_priority";
+    if (!state.cardSpending) return "card_spending";
+    return "result";
+  }
+
+  if (state.goal === "send") {
+    if (!state.sendDestination) return "send_destination";
+    if (!state.sendAmount) return "send_amount";
+    return "result";
+  }
+
+  return "goal";
+}
+
+function getPreviousStep(step: QuizStep, goal: Goal | null): QuizStep {
+  const previousByStep: Record<QuizStep, QuizStep> = {
+    goal: "goal",
+    save_term: "goal",
+    save_amount: "save_term",
+    borrow_purpose: "goal",
+    borrow_amount: "borrow_purpose",
+    card_geography: "goal",
+    card_priority: "card_geography",
+    card_spending: "card_priority",
+    send_destination: "goal",
+    send_amount: "send_destination",
+    result: goal === "spend" ? "card_spending" : goal === "borrow" ? "borrow_amount" : goal === "send" ? "send_amount" : "save_amount",
   };
-  return map[step];
+
+  return previousByStep[step];
 }
 
-function getTotalSteps(step: QuizStep, quiz: QuizState): number {
-  if (quiz.goal === "spend" || ["card_usage", "card_priority", "card_spending"].includes(step)) return 4;
-  return 3;
+function getStepIndex(step: QuizStep, goal: Goal | null): number {
+  if (!goal) return 0;
+
+  const indexes: Record<Goal, Partial<Record<QuizStep, number>>> = {
+    save: { save_term: 1, save_amount: 2, result: 3 },
+    borrow: { borrow_purpose: 1, borrow_amount: 2, result: 3 },
+    spend: { card_geography: 1, card_priority: 2, card_spending: 3, result: 4 },
+    send: { send_destination: 1, send_amount: 2, result: 3 },
+  };
+
+  return indexes[goal][step] ?? 0;
+}
+
+function getTotalSteps(goal: Goal | null): number {
+  if (goal === "spend") return 4;
+  if (goal === "save" || goal === "borrow" || goal === "send") return 3;
+  return 1;
+}
+
+const initialQuizState: QuizState = {
+  goal: null,
+  saveTerm: null,
+  saveAmount: null,
+  borrowPurpose: null,
+  borrowAmount: null,
+  cardGeography: null,
+  cardPriority: null,
+  cardSpending: null,
+  sendDestination: null,
+  sendAmount: null,
+};
+
+function BankCard() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      className="relative mx-auto aspect-[1.58] w-full max-w-[28rem] rotate-[-6deg] rounded-lg bg-brand-green text-white shadow-2xl"
+    >
+      <div className="absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.26),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.16),transparent_48%)]" />
+
+      <div className="absolute inset-0 flex flex-col justify-between p-6 sm:p-8">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold tracking-[0.18em] sm:text-base">INECOBANK VISA</span>
+          <div className="h-8 w-11 rounded-md bg-white/25 ring-1 ring-white/30" />
+        </div>
+        <div className="text-xl font-semibold tracking-[0.18em] sm:text-2xl">•••• •••• •••• 4242</div>
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="text-[10px] uppercase text-white/70">Держатель</p>
+            <p className="text-sm font-semibold tracking-wide sm:text-base">ИВАН ИВАНОВ</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] uppercase text-white/70">До</p>
+            <p className="text-sm font-semibold sm:text-base">12/28</p>
+          </div>
+          <svg className="h-8 w-14" viewBox="0 0 72 28" role="img" aria-label="Visa">
+            <text x="0" y="22" fill="white" fontSize="24" fontWeight="800" fontFamily="Arial, sans-serif" letterSpacing="-2">
+              VISA
+            </text>
+          </svg>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 function ProductQuiz() {
   const [step, setStep] = useState<QuizStep>("goal");
-  const [quiz, setQuiz] = useState<QuizState>({
-    goal: null, term: null, amount: null,
-    cardUsage: null, cardPriority: null, cardSpending: null,
-  });
+  const [quiz, setQuiz] = useState<QuizState>(initialQuizState);
   const { showToast } = useToast();
 
-  const stepIndex = getStepIndex(step);
-  const totalSteps = getTotalSteps(step, quiz);
+  const stepIndex = getStepIndex(step, quiz.goal);
+  const totalSteps = getTotalSteps(quiz.goal);
   const rec = getRecommendation(quiz);
+  const progress = (stepIndex / totalSteps) * 100;
 
   const resetQuiz = () => {
-    setQuiz({ goal: null, term: null, amount: null, cardUsage: null, cardPriority: null, cardSpending: null });
+    setQuiz(initialQuizState);
     setStep("goal");
   };
 
   const goBack = () => {
-    if (step === "term") { setQuiz((c) => ({ ...c, term: null })); setStep("goal"); }
-    else if (step === "amount") { setQuiz((c) => ({ ...c, amount: null })); setStep("term"); }
-    else if (step === "card_usage") { setQuiz((c) => ({ ...c, cardUsage: null })); setStep("goal"); }
-    else if (step === "card_priority") { setQuiz((c) => ({ ...c, cardPriority: null })); setStep("card_usage"); }
-    else if (step === "card_spending") { setQuiz((c) => ({ ...c, cardSpending: null })); setStep("card_priority"); }
+    const previousStep = getPreviousStep(step, quiz.goal);
+    setStep(previousStep);
   };
+
+  function updateQuiz(nextQuiz: QuizState) {
+    setQuiz(nextQuiz);
+    setStep(getNextStep(nextQuiz));
+  }
 
   return (
     <Section id="quiz" className="bg-[#F5F5F5] py-16">
@@ -708,20 +918,21 @@ function ProductQuiz() {
         </motion.div>
 
         <div className="mx-auto mt-10 max-w-xl">
-          {step !== "result" ? (
-            <div className="mb-8 flex items-center gap-2">
-              {Array.from({ length: totalSteps }).map((_, index) => (
+          {quiz.goal ? (
+            <div className="mb-8">
+              <div className="h-1.5 overflow-hidden rounded-full bg-gray-200">
                 <div
-                  key={index}
-                  className={`h-1.5 flex-1 rounded-full transition-colors ${
-                    index < stepIndex ? "bg-brand-green" : "bg-gray-200"
-                  }`}
+                  className="h-full rounded-full bg-brand-green transition-all duration-300"
+                  style={{ width: `${progress}%` }}
                 />
-              ))}
+              </div>
+              <p className="mt-2 text-xs font-medium text-gray-400">
+                Шаг {Math.min(stepIndex, totalSteps)} из {totalSteps}
+              </p>
             </div>
           ) : null}
 
-          {step !== "goal" && step !== "result" ? (
+          {step !== "goal" ? (
             <button
               type="button"
               onClick={goBack}
@@ -743,8 +954,9 @@ function ProductQuiz() {
                       key={goal.id}
                       type="button"
                       onClick={() => {
-                        setQuiz((current) => ({ ...current, goal: goal.id }));
-                        setStep(goal.id === "spend" ? "card_usage" : "term");
+                        const nextQuiz = { ...initialQuizState, goal: goal.id };
+                        setQuiz(nextQuiz);
+                        setStep(getNextStep(nextQuiz));
                       }}
                       className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green hover:shadow-md"
                     >
@@ -757,15 +969,15 @@ function ProductQuiz() {
             </div>
           ) : null}
 
-          {step === "term" ? (
+          {step === "save_term" ? (
             <div>
-              <p className="mb-4 font-semibold text-gray-900">На какой срок?</p>
+              <p className="mb-4 font-semibold text-gray-900">На какой срок хотите разместить деньги?</p>
               <div className="flex flex-col gap-3">
-                {TERMS.map((term) => (
+                {SAVE_TERMS.map((term) => (
                   <button
                     key={term.id}
                     type="button"
-                    onClick={() => { setQuiz((current) => ({ ...current, term: term.id })); setStep("amount"); }}
+                    onClick={() => updateQuiz({ ...quiz, saveTerm: term.id })}
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
                   >
                     {term.label}
@@ -775,15 +987,15 @@ function ProductQuiz() {
             </div>
           ) : null}
 
-          {step === "amount" ? (
+          {step === "save_amount" ? (
             <div>
-              <p className="mb-4 font-semibold text-gray-900">Какая сумма?</p>
+              <p className="mb-4 font-semibold text-gray-900">Какую сумму планируете разместить?</p>
               <div className="flex flex-col gap-3">
-                {AMOUNTS.map((amount) => (
+                {SAVE_AMOUNTS.map((amount) => (
                   <button
                     key={amount.id}
                     type="button"
-                    onClick={() => { setQuiz((current) => ({ ...current, amount: amount.id })); setStep("result"); }}
+                    onClick={() => updateQuiz({ ...quiz, saveAmount: amount.id })}
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
                   >
                     {amount.label}
@@ -793,15 +1005,51 @@ function ProductQuiz() {
             </div>
           ) : null}
 
-          {step === "card_usage" ? (
+          {step === "borrow_purpose" ? (
             <div>
-              <p className="mb-4 font-semibold text-gray-900">Где вы чаще используете карту?</p>
+              <p className="mb-4 font-semibold text-gray-900">На что берёте кредит?</p>
               <div className="flex flex-col gap-3">
-                {CARD_USAGES.map((item) => (
+                {BORROW_PURPOSES.map((purpose) => (
+                  <button
+                    key={purpose.id}
+                    type="button"
+                    onClick={() => updateQuiz({ ...quiz, borrowPurpose: purpose.id })}
+                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
+                  >
+                    {purpose.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {step === "borrow_amount" ? (
+            <div>
+              <p className="mb-4 font-semibold text-gray-900">Какая нужна сумма?</p>
+              <div className="flex flex-col gap-3">
+                {BORROW_AMOUNTS.map((amount) => (
+                  <button
+                    key={amount.id}
+                    type="button"
+                    onClick={() => updateQuiz({ ...quiz, borrowAmount: amount.id })}
+                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
+                  >
+                    {amount.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {step === "card_geography" ? (
+            <div>
+              <p className="mb-4 font-semibold text-gray-900">Где будете пользоваться картой?</p>
+              <div className="flex flex-col gap-3">
+                {CARD_GEOGRAPHIES.map((item) => (
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => { setQuiz((c) => ({ ...c, cardUsage: item.id })); setStep("card_priority"); }}
+                    onClick={() => updateQuiz({ ...quiz, cardGeography: item.id })}
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
                   >
                     <p className="text-sm font-semibold text-gray-800">{item.label}</p>
@@ -820,7 +1068,7 @@ function ProductQuiz() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => { setQuiz((c) => ({ ...c, cardPriority: item.id })); setStep("card_spending"); }}
+                    onClick={() => updateQuiz({ ...quiz, cardPriority: item.id })}
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
                   >
                     <p className="text-sm font-semibold text-gray-800">{item.label}</p>
@@ -839,11 +1087,47 @@ function ProductQuiz() {
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => { setQuiz((c) => ({ ...c, cardSpending: item.id })); setStep("result"); }}
+                    onClick={() => updateQuiz({ ...quiz, cardSpending: item.id })}
                     className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
                   >
                     <p className="text-sm font-semibold text-gray-800">{item.label}</p>
                     <p className="mt-1 text-xs text-gray-400">{item.sub}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {step === "send_destination" ? (
+            <div>
+              <p className="mb-4 font-semibold text-gray-900">Куда нужно перевести?</p>
+              <div className="flex flex-col gap-3">
+                {SEND_DESTINATIONS.map((destination) => (
+                  <button
+                    key={destination.id}
+                    type="button"
+                    onClick={() => updateQuiz({ ...quiz, sendDestination: destination.id })}
+                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
+                  >
+                    {destination.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {step === "send_amount" ? (
+            <div>
+              <p className="mb-4 font-semibold text-gray-900">Примерная сумма перевода?</p>
+              <div className="flex flex-col gap-3">
+                {SEND_AMOUNTS.map((amount) => (
+                  <button
+                    key={amount.id}
+                    type="button"
+                    onClick={() => updateQuiz({ ...quiz, sendAmount: amount.id })}
+                    className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-sm font-medium text-gray-700 shadow-sm transition-all hover:border-brand-green hover:text-brand-green"
+                  >
+                    {amount.label}
                   </button>
                 ))}
               </div>
@@ -860,7 +1144,7 @@ function ProductQuiz() {
                 <CheckCircle className="h-7 w-7 text-brand-green" />
               </div>
               <h3 className="mt-5 text-xl font-bold text-gray-900">{rec.title}</h3>
-              <p className="mt-3 text-gray-500">{rec.text}</p>
+              <p className="mt-3 text-gray-500">{rec.description}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 {rec.href === "#" ? (
                   <button
@@ -894,44 +1178,6 @@ function ProductQuiz() {
   );
 }
 
-function BankCard() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: 0.2 }}
-      className="relative mx-auto aspect-[1.58] w-full max-w-[28rem] rotate-[-6deg] rounded-lg bg-brand-green text-white shadow-2xl"
-    >
-      {/* глянцевый оверлей */}
-      <div className="absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.26),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.16),transparent_48%)]" />
-
-      {/* контент — растянут через absolute, паддинг здесь */}
-      <div className="absolute inset-0 flex flex-col justify-between p-6 sm:p-8">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-bold tracking-[0.18em] sm:text-base">INECOBANK VISA</span>
-          <div className="h-8 w-11 rounded-md bg-white/25 ring-1 ring-white/30" />
-        </div>
-        <div className="text-xl font-semibold tracking-[0.18em] sm:text-2xl">•••• •••• •••• 4242</div>
-        <div className="flex items-end justify-between">
-          <div>
-            <p className="text-[10px] uppercase text-white/70">Держатель</p>
-            <p className="text-sm font-semibold tracking-wide sm:text-base">ИВАН ИВАНОВ</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] uppercase text-white/70">До</p>
-            <p className="text-sm font-semibold sm:text-base">12/28</p>
-          </div>
-          <svg className="h-8 w-14" viewBox="0 0 72 28" role="img" aria-label="Visa">
-            <text x="0" y="22" fill="white" fontSize="24" fontWeight="800" fontFamily="Arial, sans-serif" letterSpacing="-2">
-              VISA
-            </text>
-          </svg>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 export function HomePage() {
   const { showToast } = useToast();
 
@@ -941,7 +1187,7 @@ export function HomePage() {
       <section className="relative min-h-screen overflow-hidden bg-white pt-20">
         <div className="absolute right-0 top-0 h-[36rem] w-[36rem] translate-x-1/3 -translate-y-1/4 rounded-full bg-[radial-gradient(circle,#0A7C3E14,transparent_70%)]" />
         <div
-          className="absolute inset-0 opacity-[0.035]"
+          className="absolute inset-0 opacity-[0.06]"
           style={{
             backgroundImage: "radial-gradient(circle, #0a7c3e 1px, transparent 1px)",
             backgroundSize: "28px 28px",
@@ -979,9 +1225,9 @@ export function HomePage() {
                 </a>
               </div>
               <div className="mt-10 flex flex-wrap items-center gap-6">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
-                    <CheckCircle className="h-5 w-5 text-brand-green" />
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-green/10">
+                    <Award className="h-6 w-6 text-brand-green" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-gray-900">Банк года 2023</p>
@@ -989,31 +1235,46 @@ export function HomePage() {
                   </div>
                 </div>
                 <div className="h-10 w-px bg-gray-100" aria-hidden="true" />
-                <div>
-                  <p className="text-2xl font-extrabold text-gray-900">500 000+</p>
-                  <p className="text-xs text-gray-400">клиентов доверяют нам</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-green/10">
+                    <Users className="h-6 w-6 text-brand-green" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-extrabold text-gray-900">500 000+</p>
+                    <p className="text-xs text-gray-400">клиентов доверяют нам</p>
+                  </div>
                 </div>
                 <div className="h-10 w-px bg-gray-100" aria-hidden="true" />
-                <div>
-                  <p className="text-2xl font-extrabold text-gray-900">80+</p>
-                  <p className="text-xs text-gray-400">отделений по Армении</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-green/10">
+                    <MapPin className="h-6 w-6 text-brand-green" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-extrabold text-gray-900">80+</p>
+                    <p className="text-xs text-gray-400">отделений по Армении</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
-            <div className="pb-8 lg:pb-0">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="pb-8 lg:pb-0"
+            >
               <BankCard />
-            </div>
+            </motion.div>
           </div>
         </Container>
       </section>
 
       {/* ── QUICK ACTIONS ── */}
-      <Section className="border-y border-gray-100 bg-white py-8">
+      <Section className="bg-[#F5F5F5] py-10">
         <Container>
           <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
             Что вы хотите сделать?
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-6 flex flex-wrap justify-center gap-4">
             {quickActions.map(({ label, icon: Icon, href, toast: toastMsg }, i) =>
               href ? (
                 <motion.a
@@ -1023,10 +1284,10 @@ export function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: i * 0.07 }}
-                  whileHover={{ y: -2 }}
-                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-brand-green hover:text-brand-green"
+                  whileHover={{ y: -4 }}
+                  className="flex w-[104px] flex-col items-center gap-3 rounded-2xl bg-white px-3 py-5 text-center text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:text-brand-green"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-6 w-6 text-brand-green" />
                   {label}
                 </motion.a>
               ) : (
@@ -1038,10 +1299,10 @@ export function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: i * 0.07 }}
-                  whileHover={{ y: -2 }}
-                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-brand-green hover:text-brand-green"
+                  whileHover={{ y: -4 }}
+                  className="flex w-[104px] flex-col items-center gap-3 rounded-2xl bg-white px-3 py-5 text-center text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:text-brand-green"
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-6 w-6 text-brand-green" />
                   {label}
                 </motion.button>
               ),
@@ -1057,8 +1318,8 @@ export function HomePage() {
             <h2 className="text-3xl font-bold text-gray-950 lg:text-4xl">Наши продукты</h2>
             <p className="text-sm text-gray-400">Всё необходимое для управления финансами</p>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:gap-5">
-            {products.map(({ icon: Icon, featured, ...product }, i) => (
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+            {[...products.filter((product) => product.featured), ...products.filter((product) => !product.featured)].map(({ icon: Icon, featured, ...product }, i) => (
               <motion.a
                 key={product.title}
                 href={product.url}
@@ -1066,21 +1327,36 @@ export function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="group relative overflow-hidden rounded-2xl bg-[#F5F5F5] p-7 transition-shadow hover:shadow-md"
+                className={`group relative overflow-hidden rounded-2xl p-7 transition-shadow hover:shadow-md ${
+                  featured
+                    ? "bg-gradient-to-br from-brand-green to-brand-green-light text-white sm:col-span-2 lg:col-span-3 lg:min-h-[16rem]"
+                    : "bg-[#F5F5F5]"
+                }`}
               >
-                <Icon className="absolute -right-4 -top-4 h-32 w-32 text-brand-green/[0.08] transition-transform duration-500 group-hover:scale-110" />
+                {featured ? (
+                  <span className="pointer-events-none absolute right-8 top-4 text-5xl font-black text-white/30 sm:text-7xl">
+                    от 17%
+                  </span>
+                ) : null}
+                <Icon
+                  className={`absolute -right-4 -top-4 h-32 w-32 transition-transform duration-500 group-hover:scale-110 ${
+                    featured ? "text-white/10" : "text-brand-green/[0.08]"
+                  }`}
+                />
                 <div className="relative mt-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-bold text-gray-950">{product.title}</h3>
+                    <h3 className={`text-lg font-bold ${featured ? "text-white" : "text-gray-950"}`}>{product.title}</h3>
                     {featured && (
-                      <span className="rounded-full bg-brand-green/10 px-2.5 py-0.5 text-xs font-semibold text-brand-green">
+                      <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold text-white">
                         Популярное
                       </span>
                     )}
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-gray-500">{product.text}</p>
+                  <p className={`mt-3 text-sm leading-7 ${featured ? "max-w-xl text-white/80" : "text-gray-500"}`}>{product.text}</p>
                 </div>
-                <p className="relative mt-6 text-sm font-semibold text-brand-green transition-colors group-hover:text-brand-green-light">
+                <p className={`relative mt-6 text-sm font-semibold transition-colors ${
+                  featured ? "text-white" : "text-brand-green group-hover:text-brand-green-light"
+                }`}>
                   {product.cta} →
                 </p>
               </motion.a>
@@ -1098,7 +1374,7 @@ export function HomePage() {
       {/* ── EXCHANGE RATES ── */}
       <Section className="bg-white py-10 lg:py-16">
         <Container>
-          <div className="overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
             <div className="flex flex-col gap-2 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-2xl font-bold text-gray-950">Курсы валют</h2>
               <p className="text-sm text-gray-400">Обновлено: сегодня, 15:00</p>
@@ -1115,15 +1391,25 @@ export function HomePage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {exchangeRates.map((rate) => (
-                    <tr key={rate.currency}>
+                    <tr key={rate.currency} className={rate.code === "USD" ? "bg-green-50/40" : ""}>
                       <td className="px-5 py-4 font-medium text-gray-900">{rate.currency}</td>
                       <td className="px-5 py-4">
                         <span className="inline-block w-8 rounded bg-gray-100 px-1 py-0.5 text-center text-xs font-bold text-gray-500">
                           {rate.code}
                         </span>
                       </td>
-                      <td className="px-5 py-4 text-gray-700">{rate.buy}</td>
-                      <td className="px-5 py-4 text-gray-700">{rate.sell}</td>
+                      <td className="px-5 py-4 text-gray-700">
+                        <span className="inline-flex items-center gap-1.5">
+                          <TrendingUp className="h-4 w-4 text-emerald-500" />
+                          {rate.buy}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-gray-700">
+                        <span className="inline-flex items-center gap-1.5">
+                          <TrendingDown className="h-4 w-4 text-red-500" />
+                          {rate.sell}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1149,19 +1435,29 @@ export function HomePage() {
             <h2 className="text-3xl font-bold text-gray-950 lg:text-4xl">Оплачивайте онлайн</h2>
             <p className="mt-3 text-gray-500">Коммунальные услуги, интернет, телефон — без очередей</p>
           </div>
-          <div className="mx-auto mt-10 grid max-w-4xl grid-cols-4 gap-4">
+          <div className="mx-auto mt-10 grid max-w-6xl grid-cols-4 gap-4 sm:grid-cols-4 lg:grid-cols-9">
             {paymentServices.map((service) => (
-              <div key={service.text} className="flex flex-col items-center gap-3 text-center">
+              <div key={service.text} className="rounded-xl bg-white p-4 text-center shadow-sm">
                 <div
-                  className="flex h-16 w-16 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm sm:h-20 sm:w-20 sm:text-sm"
+                  className="mx-auto flex h-14 w-14 items-center justify-center rounded-full text-sm font-bold text-white shadow-sm"
                   style={{ backgroundColor: service.color }}
                 >
                   {service.text}
                 </div>
+                <p className="mt-3 text-xs font-semibold text-gray-600">
+                  {service.name}
+                </p>
               </div>
             ))}
+            <div className="rounded-xl bg-gray-100 p-4 text-center shadow-sm">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gray-200 text-lg font-black text-gray-500">
+                ...
+              </div>
+              <p className="mt-3 text-xs font-semibold text-gray-600">
+                + 500 других
+              </p>
+            </div>
           </div>
-          <p className="mt-8 text-center text-gray-500">+ 500 других платёжных сервисов</p>
         </Container>
       </Section>
 
@@ -1183,13 +1479,26 @@ export function HomePage() {
               <p className="mt-3 max-w-sm text-white/60">
                 Основан в 1996 году. Один из крупнейших частных банков страны под надзором Центрального банка Армении.
               </p>
+              <div className="mt-8 grid max-w-md grid-cols-3 gap-4 text-xs font-mono text-white/60">
+                {[
+                  ["1996", "основан"],
+                  ["2010", "цифровой банкинг"],
+                  ["2023", "банк года"],
+                ].map(([year, label]) => (
+                  <div key={year} className="relative border-t border-white/30 pt-3">
+                    <span className="absolute -top-1 left-0 h-2 w-2 rounded-full bg-white/70" />
+                    <p className="font-semibold text-white/80">{year}</p>
+                    <p className="mt-1 leading-4">{label}</p>
+                  </div>
+                ))}
+              </div>
             </motion.div>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:grid-cols-1 lg:gap-0 lg:divide-y lg:divide-white/15">
               {[
-                { value: "500 000+", label: "Клиентов", sub: "доверяют нам свои финансы" },
-                { value: "80+", label: "Отделений", sub: "по всей Армении" },
-                { value: "24/7", label: "Онлайн-сервис", sub: "без выходных и праздников" },
-              ].map(({ value, label, sub }, i) => (
+                { value: "500 000+", label: "Клиентов", sub: "доверяют нам свои финансы", icon: Users },
+                { value: "80+", label: "Отделений", sub: "по всей Армении", icon: Building2 },
+                { value: "24/7", label: "Онлайн-сервис", sub: "без выходных и праздников", icon: Clock },
+              ].map(({ value, label, sub, icon: Icon }, i) => (
                 <motion.div
                   key={label}
                   initial={{ opacity: 0, x: 24 }}
@@ -1198,7 +1507,10 @@ export function HomePage() {
                   transition={{ duration: 0.45, delay: i * 0.1 }}
                   className="lg:py-7 lg:first:pt-0 lg:last:pb-0"
                 >
-                  <div className="text-3xl font-extrabold">{value}</div>
+                  <div className="flex items-center gap-3">
+                    <Icon className="h-6 w-6 text-white/60" />
+                    <div className="text-3xl font-extrabold">{value}</div>
+                  </div>
                   <p className="mt-1 font-semibold">{label}</p>
                   <p className="mt-0.5 text-sm text-white/60">{sub}</p>
                 </motion.div>
@@ -1238,7 +1550,7 @@ export function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="flex flex-col rounded-xl border border-gray-100 bg-white p-7 shadow-sm lg:col-span-3"
+              className={`flex flex-col rounded-xl border-t-4 bg-white p-7 shadow-sm lg:col-span-3 ${tagBorderClass(news[0].tag)}`}
             >
               <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${tagColorClass(news[0].tag)}`}>
                 {news[0].tag}
@@ -1264,7 +1576,7 @@ export function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 + i * 0.1 }}
-                  className="flex flex-1 flex-col rounded-xl border border-gray-100 bg-white p-6 shadow-sm"
+                  className={`flex flex-1 flex-col rounded-xl border-t-4 bg-white p-6 shadow-sm ${tagBorderClass(item.tag)}`}
                 >
                   <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${tagColorClass(item.tag)}`}>
                     {item.tag}

@@ -6,17 +6,20 @@ import {
   BarChart2,
   Calculator,
   ChevronDown,
-  ChevronRight,
   CheckCircle,
+  Code2,
   FileText,
   FlaskConical,
   HelpCircle,
   ListChecks,
-  MapPin,
+  ListOrdered,
+  Mail,
   Monitor,
   Navigation,
   Smartphone,
   Target,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
@@ -90,15 +93,9 @@ const PROBLEMS: Problem[] = [
     impact: "Высокий bounce rate на мобильных устройствах.",
   },
   {
-    icon: MapPin,
-    title: "Нет поиска по отделениям",
-    text: "Список отделений — статичная страница без поиска и фильтров. Пользователь вынужден просматривать весь список вручную.",
-    impact: "Снижение офлайн-трафика, раздражение пользователей.",
-  },
-  {
     icon: HelpCircle,
-    title: "FAQ неудобен",
-    text: "Вопросы перечислены плоским списком без категорий. Найти нужный ответ — значит прочитать всё.",
+    title: "FAQ без поиска",
+    text: "Вопросы разбиты по вкладкам, но найти конкретный ответ быстро не получится: поиска внутри раздела нет, весь текст раскрыт сразу.",
     impact: "Рост нагрузки на колл-центр по типовым вопросам.",
   },
   {
@@ -128,13 +125,8 @@ const SOLUTIONS = [
     page: "/",
   },
   {
-    problem: "Нет поиска по отделениям",
-    solution: "Поиск + фильтры по типу и городу на странице отделений",
-    page: "/branches",
-  },
-  {
-    problem: "FAQ неудобен",
-    solution: "Категории + аккордеон, одновременно открыт один вопрос",
+    problem: "FAQ без поиска",
+    solution: "Поиск по тексту + аккордеон — нужный ответ за секунды",
     page: "/faq",
   },
   {
@@ -150,7 +142,7 @@ const SOLUTIONS = [
 ];
 
 const EXECUTIVE_SUMMARY = [
-  "Нашёл 6 точек потерь на текущем inecobank.am",
+  "Нашёл решения, которые можно сделать лучше, чем на текущем inecobank.am",
   "Сформулировал 4 продуктовые гипотезы и метрики успеха",
   "Собрал работающий прототип вместо презентации с рекомендациями",
   "Следующий шаг: аналитика, compliance review и A/B-тесты",
@@ -421,21 +413,47 @@ export function PitchPage() {
         </div>
       </header>
 
-      <section className="bg-white py-20 text-center">
+      <section className="relative overflow-hidden border-b border-gray-100 bg-[#f8fbf8] py-20 text-center">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-brand-green/20" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,124,62,0.04)_1px,transparent_1px),linear-gradient(180deg,rgba(10,124,62,0.04)_1px,transparent_1px)] bg-[size:48px_48px]" />
         <Container>
-          <motion.div {...sectionAnimation}>
+          <motion.div {...sectionAnimation} className="relative">
             <p className="text-sm font-semibold tracking-widest text-brand-green uppercase">
               Инициативный проект
             </p>
+            <div className="mx-auto mt-6 flex max-w-xl flex-col items-stretch overflow-hidden rounded-lg bg-white text-left shadow-sm ring-1 ring-brand-green/10 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-3 bg-gray-950 px-5 py-4 text-white sm:w-1/2">
+                <span className="text-[3.5rem] leading-none font-black text-white/90">
+                  5
+                </span>
+                <div>
+                  <p className="text-xs font-semibold tracking-widest text-white/50 uppercase">
+                    Before
+                  </p>
+                  <p className="text-sm font-bold">направлений роста</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-5 py-4 text-brand-green sm:w-1/2">
+                <span className="text-[3.5rem] leading-none font-black">1</span>
+                <div>
+                  <p className="text-xs font-semibold tracking-widest text-brand-green/60 uppercase">
+                    After
+                  </p>
+                  <p className="text-sm font-bold text-gray-900">
+                    рабочий прототип
+                  </p>
+                </div>
+              </div>
+            </div>
             <h1 className="mt-4 text-4xl font-extrabold text-gray-950 sm:text-5xl">
               Редизайн inecobank.am
             </h1>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-gray-500">
+            <p className="mx-auto mt-5 max-w-2xl text-xl leading-8 text-gray-600">
               Меня зовут Давид. Готовясь к разговору с вами, я открыл
-              inecobank.am и обнаружил шесть точек, где банк теряет клиентов:
-              от отсутствия калькуляторов до слабой мобильной версии. Я не стал
-              делать презентацию с рекомендациями — я построил работающий сайт
-              со всеми исправлениями. Без команды и дизайнеров. За 3 часа.
+              inecobank.am и увидел, какие решения можно сделать сильнее: от
+              калькуляторов до мобильного опыта. Я не стал делать презентацию с
+              рекомендациями — я построил работающий сайт с ключевыми
+              улучшениями. Без команды и дизайнеров. За один вечер.
             </p>
           </motion.div>
         </Container>
@@ -471,24 +489,29 @@ export function PitchPage() {
             <p className="mt-2 text-gray-500">Анализ текущего inecobank.am</p>
           </motion.div>
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {PROBLEMS.map((problem) => {
+            {PROBLEMS.map((problem, index) => {
               const Icon = problem.icon;
 
               return (
                 <motion.div
                   key={problem.title}
                   {...sectionAnimation}
-                  className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+                  className="relative overflow-hidden rounded-lg bg-red-50/30 p-6 shadow-sm"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50">
+                  <span className="absolute top-4 left-5 text-5xl leading-none font-black text-gray-200">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div className="relative ml-auto flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
                     <Icon className="h-5 w-5 text-red-500" />
                   </div>
-                  <h3 className="mt-4 font-bold text-gray-900">
+                  <h3 className="relative mt-5 font-bold text-gray-900">
                     {problem.title}
                   </h3>
-                  <p className="mt-2 text-sm text-gray-600">{problem.text}</p>
-                  <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600">
+                  <p className="relative mt-2 text-xs font-semibold leading-5 text-red-700">
                     {problem.impact}
+                  </p>
+                  <p className="relative mt-3 text-sm leading-6 text-gray-600">
+                    {problem.text}
                   </p>
                 </motion.div>
               );
@@ -566,26 +589,47 @@ export function PitchPage() {
             </p>
           </motion.div>
 
-          <div className="mt-10 hidden items-start gap-2 sm:flex">
+          <div className="mt-10 hidden items-start gap-2 lg:flex">
             {FUNNEL.map((item, index) => {
               const Icon = item.icon;
+              const isGoal = index === FUNNEL.length - 1;
 
               return (
                 <div key={item.step} className="flex items-start gap-2">
                   <motion.div
                     {...sectionAnimation}
-                    className="flex w-44 flex-col items-center text-center"
+                    className={`flex w-44 flex-col items-center rounded-lg p-4 text-center shadow-sm ${
+                      isGoal
+                        ? "bg-brand-green text-white"
+                        : "bg-white text-gray-900 ring-1 ring-gray-100"
+                    }`}
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green/10">
-                      <Icon className="h-6 w-6 text-brand-green" />
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-full ${
+                        isGoal ? "bg-white/20" : "bg-brand-green/10"
+                      }`}
+                    >
+                      <Icon
+                        className={`h-6 w-6 ${
+                          isGoal ? "text-white" : "text-brand-green"
+                        }`}
+                      />
                     </div>
-                    <p className="mt-1 text-xs font-semibold text-brand-green">
+                    <p
+                      className={`mt-3 text-xs font-semibold ${
+                        isGoal ? "text-white/70" : "text-brand-green"
+                      }`}
+                    >
                       Шаг {item.step}
                     </p>
-                    <p className="mt-1 text-sm font-bold text-gray-900">
-                      {item.label}
+                    <p className="mt-1 text-sm font-bold">{item.label}</p>
+                    <p
+                      className={`mt-1 text-xs ${
+                        isGoal ? "text-white/75" : "text-gray-500"
+                      }`}
+                    >
+                      {item.detail}
                     </p>
-                    <p className="mt-1 text-xs text-gray-500">{item.detail}</p>
                     {item.loss ? (
                       <p className="mt-2 rounded-lg bg-red-50 px-2 py-1 text-xs font-medium text-red-600">
                         {item.loss}
@@ -593,37 +637,60 @@ export function PitchPage() {
                     ) : null}
                   </motion.div>
                   {index < FUNNEL.length - 1 ? (
-                    <ChevronRight className="mt-5 h-5 w-5 shrink-0 text-gray-300" />
+                    <span className="mt-9 text-xl font-bold text-gray-300">
+                      →
+                    </span>
                   ) : null}
                 </div>
               );
             })}
           </div>
 
-          <div className="mt-8 flex flex-col gap-2 sm:hidden">
+          <div className="mt-8 flex flex-col gap-2 lg:hidden">
             {FUNNEL.map((item, index) => {
               const Icon = item.icon;
+              const isGoal = index === FUNNEL.length - 1;
 
               return (
                 <div key={item.step} className="flex flex-col items-center">
                   <motion.div
                     {...sectionAnimation}
-                    className="w-full rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+                    className={`w-full rounded-lg p-5 shadow-sm ${
+                      isGoal
+                        ? "bg-brand-green text-white"
+                        : "bg-white text-gray-900 ring-1 ring-gray-100"
+                    }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-green/10">
-                        <Icon className="h-5 w-5 text-brand-green" />
+                      <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                          isGoal ? "bg-white/20" : "bg-brand-green/10"
+                        }`}
+                      >
+                        <Icon
+                          className={`h-5 w-5 ${
+                            isGoal ? "text-white" : "text-brand-green"
+                          }`}
+                        />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-brand-green">
+                        <p
+                          className={`text-xs font-semibold ${
+                            isGoal ? "text-white/70" : "text-brand-green"
+                          }`}
+                        >
                           Шаг {item.step}
                         </p>
-                        <p className="text-sm font-bold text-gray-900">
-                          {item.label}
-                        </p>
+                        <p className="text-sm font-bold">{item.label}</p>
                       </div>
                     </div>
-                    <p className="mt-2 text-sm text-gray-500">{item.detail}</p>
+                    <p
+                      className={`mt-2 text-sm ${
+                        isGoal ? "text-white/75" : "text-gray-500"
+                      }`}
+                    >
+                      {item.detail}
+                    </p>
                     {item.loss ? (
                       <p className="mt-2 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600">
                         {item.loss}
@@ -852,32 +919,46 @@ export function PitchPage() {
             </p>
           </motion.div>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {METRICS.map((metric) => (
-              <motion.div
-                key={metric.metric}
-                {...sectionAnimation}
-                className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
-              >
-                <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
-                  {metric.metric}
-                </p>
-                <div className="mt-3 flex items-end gap-3">
-                  <span className="text-2xl font-extrabold text-gray-300 line-through">
-                    {metric.current}
-                  </span>
-                  <span className="text-3xl font-extrabold text-brand-green">
-                    {metric.target}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm text-gray-500">{metric.how}</p>
-                {metric.estimated ? (
-                  <p className="mt-1 text-xs text-gray-400 italic">
-                    * Текущий показатель — оценочный, на основе анализа воронки.
-                    Точные данные — после подключения GA4.
+            {METRICS.map((metric) => {
+              const isDownMetric =
+                metric.metric === "Bounce rate" ||
+                metric.metric === "Звонки в колл-центр";
+              const MetricIcon = isDownMetric ? TrendingDown : TrendingUp;
+
+              return (
+                <motion.div
+                  key={metric.metric}
+                  {...sectionAnimation}
+                  className="rounded-lg bg-gradient-to-br from-green-50 to-white p-6 shadow-sm ring-1 ring-brand-green/10"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
+                      {metric.metric}
+                    </p>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-brand-green shadow-sm">
+                      <MetricIcon className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-end gap-3">
+                    <span className="text-4xl leading-none font-extrabold text-brand-green">
+                      {metric.target}
+                    </span>
+                    <span className="pb-1 text-sm font-semibold text-gray-400 line-through">
+                      {metric.current}
+                    </span>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-gray-600">
+                    {metric.how}
                   </p>
-                ) : null}
-              </motion.div>
-            ))}
+                  {metric.estimated ? (
+                    <p className="mt-2 text-xs leading-5 text-gray-400 italic">
+                      * Текущий показатель — оценочный, на основе анализа
+                      воронки. Точные данные — после подключения GA4.
+                    </p>
+                  ) : null}
+                </motion.div>
+              );
+            })}
           </div>
           <p className="mt-6 text-xs text-gray-400">
             * Текущие показатели — оценочные, на основе визуального анализа
@@ -921,10 +1002,13 @@ export function PitchPage() {
         <Container>
           <motion.div
             {...sectionAnimation}
-            className="grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-2"
+            className="grid max-w-3xl grid-cols-1 gap-8 sm:grid-cols-2"
           >
             <div>
-              <h3 className="font-bold text-gray-900">Стек</h3>
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-green/10 text-brand-green">
+                <Code2 className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 font-bold text-gray-900">Стек</h3>
               <p className="mt-2 text-sm text-gray-500">
                 Умею собирать прототипы самостоятельно — это ускоряет discovery
                 и снижает стоимость экспериментов.
@@ -942,7 +1026,10 @@ export function PitchPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-bold text-gray-900">Процесс</h3>
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-green/10 text-brand-green">
+                <ListOrdered className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 font-bold text-gray-900">Процесс</h3>
               <ul className="mt-4 space-y-2">
                 {PROCESS.map((item, index) => (
                   <li
@@ -958,7 +1045,7 @@ export function PitchPage() {
               </ul>
             </div>
           </motion.div>
-          <p className="mt-4 text-xs text-gray-400">
+          <p className="mt-8 rounded-r-lg border-l-4 border-brand-green bg-gray-50 p-4 text-sm leading-6 text-gray-600 italic">
             В реальном проекте этот редизайн прошёл бы discovery-сессии с
             командой, согласование с compliance и поэтапный A/B-тест перед
             полным запуском. Прототип — это способ проверить направление, а не
@@ -971,7 +1058,7 @@ export function PitchPage() {
         <Container>
           <motion.div {...sectionAnimation}>
             <h2 className="text-3xl font-extrabold">
-              Ищу роль Product Manager
+              Покажу, как думаю — на вашем продукте
             </h2>
             <p className="mx-auto mt-4 max-w-md text-white/80">
               Этот редизайн — пример того, как я работаю: нахожу проблему,
@@ -981,8 +1068,9 @@ export function PitchPage() {
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
               <a
                 href="mailto:galoyandavid8@gmail.com"
-                className="rounded-lg bg-white px-8 py-3 text-sm font-semibold text-brand-green transition-colors hover:bg-gray-100"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-8 py-4 text-sm font-semibold text-brand-green transition-colors hover:bg-gray-100"
               >
+                <Mail className="h-4 w-4" />
                 Написать письмо
               </a>
               <Link
